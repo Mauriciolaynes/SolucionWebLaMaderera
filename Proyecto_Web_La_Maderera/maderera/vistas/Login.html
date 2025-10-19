@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style/Login.css"/>
+    <title>Iniciar Sesión</title>
+</head>
+<body>
+    
+    <form class="login" action="#" method="post">
+        
+        <h1>Iniciar Sesión</h1>
+        <label for="usuario">Usuario: </label>
+        <input type="text" id="usuario" name="usuario" required><br>
+        <label for="contraseña">Contraseña: </label>
+        <input type="password" id="contraseña" name="contraseña" required><br>
+        
+        <button type="button" onclick="window.location.href='Registrar.html'">Registrarse</button>
+        <button type="submit">Entrar</button>
+        <button type="button" class="btn-secundario" onclick="window.location.href='PaginaPrincipal.html'">Volver al Inicio</button>
+        <p>
+            <a href="../vistas/RecuperarCuenta.html" class="RecuperarCuenta">Recuperar tu contraseña</a>
+        </p>
+    </form> 
+   
+</body>
+</html>
