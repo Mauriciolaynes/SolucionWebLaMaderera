@@ -1,0 +1,201 @@
+/* --- 1. Estilos Generales --- */
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    /*Fondo del login atenuado */
+    background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url("../Img/Fondo/Maderera-Foto.png") no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+}
+
+.contenedor-principal {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+h2 {
+    text-align: center;
+    color: #444;
+    padding-bottom: 10px;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #ddd;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background-color: #ddd;
+    margin: 50px 0;
+}
+
+
+/* --- 2. Barra de Navegación (Estilo Simple/Referencia) --- */
+
+.header-carpinteria {
+    position: sticky; /* Fija el menú en la parte superior al hacer scroll */
+    top: 0;
+    z-index: 100;
+    background-color: #ffffff;
+    border-bottom: 2px solid #ccc;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.contenedor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.menu-principal-simple {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.menu-principal-simple li a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    display: block;
+    padding: 15px 20px;
+    transition: color 0.3s, border-bottom 0.3s, background-color 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.menu-principal-simple li a:hover,
+.menu-principal-simple li a.activo {
+    color: #667eea; /* Color de login para el resaltado */
+    border-bottom: 3px solid #667eea;
+    background-color: #f8f8f8;
+}
+
+.btn-login {
+    background-color: #667eea;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+    white-space: nowrap; /* Evita que el texto se rompa en dos líneas */
+}
+
+.btn-login:hover {
+    background-color: #5a67d8;
+}
+
+.btn-login {
+    background-color: #667eea;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+    white-space: nowrap; /* Evita que el texto se rompa en dos líneas */
+}
+
+.btn-login:hover {
+    background-color: #5a67d8;
+}
+/* --- 3. Galería de Productos (Grid Layout) --- */
+
+.galeria-productos {
+    display: grid;
+    /* Muestra 3 columnas en pantallas grandes */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 30px;
+    padding-bottom: 40px;
+}
+
+.tarjeta-producto {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    
+}
+
+.tarjeta-producto:hover {
+    transform: translateY(-5px); /* Pequeño efecto al pasar el mouse */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.tarjeta-producto img {
+    width: 100%;
+    height: 350px; /* Mantén la altura fija si lo deseas */
+    object-fit: contain; /* ¡CAMBIA ESTO! La imagen se ajustará entera */
+    background-color: #f0f0f0; /* Opcional: Color de fondo si hay espacios */
+}
+
+.tarjeta-producto h3 {
+    padding: 15px 15px 5px;
+    color: #222;
+    margin: 0;
+}
+
+.tarjeta-producto p {
+    padding: 0 15px;
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.tarjeta-producto .precio {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 1.2em;
+    padding: 10px 15px 15px;
+    margin-top: 10px;
+}
+
+/* --- 4. Pie de Página --- */
+
+.pie-de-pagina {
+    background-color: #333;
+    color: #f4f4f4;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 40px;
+}
+
+.pie-de-pagina p {
+    margin: 5px 0;
+}
+
+/* --- 4. Responsividad --- */
+
+@media (max-width: 600px) {
+    /* Menú en móvil: desplazamiento horizontal */
+    .barra-navegacion-carpinteria {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .menu-principal-simple {
+        flex-wrap: nowrap;
+        padding: 0 10px;
+    }
+
+    .menu-principal-simple li a {
+        padding: 12px 15px; 
+        font-size: 0.9rem;
+    }
+
+    /* Galería en móvil: 1 columna */
+    .galeria-productos {
+        grid-template-columns: 1fr;
+    }
+}
