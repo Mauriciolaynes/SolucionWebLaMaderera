@@ -11,13 +11,15 @@
 <body>
     <%-- Creamos una variable con la URL de la página principal para evitar errores de sintaxis --%>
     <c:url var="homeUrl" value="/" />
+    <c:url var="RestablecerContraseña" value="/restablecer-contraseña" />
+
 
     <form class="recuperarcuenta" action="<c:url value='/recuperar-cuenta'/>" method="post">
         <h1>Recuperar Cuenta de Usuario</h1>
         <label for="direccion">Dirección</label>
         <input type="email" id="direccion" name="direccion" required>
         
-        <button type="submit">Buscar</button>
+        <button type="button" onclick="window.location.href='${RestablecerContraseña}'">Buscar</button>
         <button type="button" class="btn-secundario" onclick="window.location.href='${homeUrl}'">Volver al Inicio</button>
               
     </form> 

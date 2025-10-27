@@ -10,7 +10,7 @@ public class HomeController {
 
     public HomeController () {}
 
-    @GetMapping("/") // Este método responderá a http://localhost:8080/laMaderera/
+    @GetMapping("/") // Este método responderá a http://localhost:8090/laMaderera/
     public String verPaginaPrincipal_GET() {
         return "PaginaPrincipal"; // Devuelve el nombre del archivo JSP (sin la extensión)
     }

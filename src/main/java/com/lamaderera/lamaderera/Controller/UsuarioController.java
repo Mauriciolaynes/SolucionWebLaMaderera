@@ -36,4 +36,11 @@ public class UsuarioController {
         // Aquí irá la lógica para validar el usuario
         return "redirect:/"; // Redirige a la página principal por ahora
     }
+
+    @PostMapping("/recuperar-cuenta")
+    public String procesarRecuperarCuenta() {
+        // Aquí irá la lógica para buscar el email del usuario y enviar el correo de recuperación.
+        // Por ahora, simplemente redirigimos a la página de restablecer contraseña.
+        return "redirect:/restablecer-contraseña";
+    }
 }
