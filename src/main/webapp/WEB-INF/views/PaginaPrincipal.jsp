@@ -21,7 +21,12 @@
                     <li><a href="#sillas">🪑 Sillas</a></li>
                 </ul>
             </nav>
-            <a href="<c:url value='/login'/>" class="btn-login">Iniciar Sesión</a>
+            <div class="acciones-header">
+                <a href="<c:url value='/login'/>" class="btn-login">Iniciar Sesión</a>
+                <a href="#" class="link-carrito">
+                    <img src="<c:url value='/imagenes/Carrito/carrito-de-compras.png'/>" alt="Carrito de Compras" class="icono-carrito">
+                </a>
+            </div>
         </div>
     </header>
 
@@ -140,9 +145,44 @@
     </main>
 
     <footer class="pie-de-pagina">
-        <div class="contenedor-principal">
+        <div class="footer-contenedor">
+            <div class="footer-columna">
+                <h4>Contacto & Atención al Cliente</h4>
+                <ul>
+                    <li><a href="#">Teléfono Lima (01)500-5540</a></li>
+                    <li><a href="#">Libro de Reclamaciones</a></li>
+                </ul>
+            </div>
+            <div class="footer-columna">
+                <h4>Sobre Nosotros</h4>
+                <ul>
+                    <li><a href="#">Nuestra historia</a></li>
+                    <li><a href="#">Horarios, locales y zonas de reparto</a></li>
+                    <li><a href="#">Trabaja con nosotros</a></li>
+                    <li><a href="#">Catalago de productos</a></li>
+                    <li><a href="#">Ventas corporativas</a></li>
+                    <li><a href="#">Comprobantes electrónicos</a></li>
+                    <li><a href="#">Ofrécenos tu inmueble</a></li>
+                </ul>
+            </div>
+            <div class="footer-columna">
+                <h4>Políticas & Términos</h4>
+                <ul>
+                    <li><a href="#">Términos y condiciones de la web</a></li>
+                    <li><a href="#">Políticas de privacidad</a></li>
+                    <li><a href="#">Políticas de delivery</a></li>
+                    <li><a href="#">Términos y condiciones de promociones y campañas</a></li>
+                    <li><a href="#">Línea Ética</a></li>
+                    <li><a href="#">Pólitica de cookies</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-logo-bottom">
+            <%-- La imagen ahora está aquí, centrada en la parte inferior --%>
+            <img src="<c:url value='/imagenes/Carrito/footer.png'/>" alt="Logo Maderera Multiservicios">
+        </div>
+        <div class="footer-copyright">
             <p>&copy; 2024 Maderera Multiservicios. Todos los derechos reservados.</p>
-            <p>Contacto: (01) 555-1234 | email@maderera.com</p>
         </div>
     </footer>
 

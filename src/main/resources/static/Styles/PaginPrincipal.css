@@ -78,6 +78,20 @@ hr {
     background-color: #f8f8f8;
 }
 
+/* Estilos para el logo en el header */
+.logo-link {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* Espacio entre el logo y el menú */
+}
+
+.logo-empresa {
+    height: 40px; /* Ajusta la altura de tu logo */
+    width: auto;  /* Mantiene la proporción */
+}
+
+
+
 .btn-login {
     background-color: #667eea;
     color: white;
@@ -93,6 +107,21 @@ hr {
 .btn-login:hover {
     background-color: #5a67d8;
 }
+
+/* Contenedor para el carrito y el botón de login */
+.acciones-header {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Espacio entre el carrito y el botón */
+}
+
+/* Estilos para el ícono del carrito */
+.icono-carrito {
+    height: 28px; /* Tamaño del ícono */
+    width: auto;
+    transition: transform 0.2s;
+}
+
 
 .btn-login {
     background-color: #667eea;
@@ -166,16 +195,71 @@ hr {
 .pie-de-pagina {
     background-color: #333;
     color: #f4f4f4;
-    text-align: center;
-    padding: 20px 0;
+    padding: 40px 20px 20px; /* Más padding arriba */
     margin-top: 40px;
 }
 
-.pie-de-pagina p {
-    margin: 5px 0;
+.footer-contenedor {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto 30px auto;
+    gap: 20px;
 }
 
-/* --- 4. Responsividad --- */
+.footer-logo-bottom {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #555;
+}
+
+.footer-logo-bottom img {
+    max-width: 1500px; /* Ajusta el tamaño máximo del logo si es necesario */
+    height: auto;
+}
+
+.footer-columna {
+    flex: 1;
+    min-width: 220px; /* Ancho mínimo para cada columna */
+}
+
+.footer-columna h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    color: #fff;
+    border-bottom: 1px solid #555;
+    padding-bottom: 10px;
+}
+
+.footer-columna ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-columna ul li a {
+    color: #ccc;
+    text-decoration: none;
+    line-height: 2;
+    transition: color 0.3s;
+}
+
+.footer-columna ul li a:hover {
+    color: #fff;
+}
+
+.footer-copyright {
+    text-align: center;
+    border-top: 1px solid #555;
+    padding-top: 20px;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+/* --- 5. Responsividad --- */
 
 @media (max-width: 600px) {
     /* Menú en móvil: desplazamiento horizontal */
