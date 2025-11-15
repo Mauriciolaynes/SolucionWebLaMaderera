@@ -1,0 +1,59 @@
+/* Pequeños ajustes para mantener la sensación original junto a Bootstrap */
+body {
+    position: relative; /* Requerido por Scrollspy de Bootstrap */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Una fuente más moderna */
+}
+
+/* Estilos para los títulos de sección (h2) */
+h2 {
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    color: #343a40;
+}
+
+/* Estilos para los títulos de producto (h5) */
+.card-title {
+    font-weight: 600; /* Un poco más de grosor para que resalte */
+    color: #212529;
+}
+.navbar-brand img {
+    max-height: 40px;
+}
+.card {
+    height: 100%; /* Asegura que todas las tarjetas en una fila tengan la misma altura */
+}
+.card-img-container {
+    overflow: hidden;
+    position: relative;
+}
+.card-img-top {
+    width: 100%;
+    height: auto; /* La altura se ajustará automáticamente */
+    transition: transform 0.35s ease;
+}
+.card:hover .card-img-top {
+    transform: scale(1.25);
+}
+.card-body {
+    /* Asegura que el contenido de la tarjeta no se superponga con la imagen al hacer zoom */
+    position: relative;
+    z-index: 1;
+}
+.precio {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #0d6efd; /* Color primario de Bootstrap */
+}
+.footer-bg {
+    background-color: #343a40; /* Un color de fondo oscuro para el footer */
+    color: #f8f9fa;
+}
+.footer-bg a {
+    color: #adb5bd;
+    text-decoration: none;
+}
+.footer-bg a:hover {
+    color: #ffffff;
+}

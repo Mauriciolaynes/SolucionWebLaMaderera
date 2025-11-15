@@ -1,0 +1,90 @@
+/* ===========================
+   Estilos para Registrar Venta
+   =========================== */
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f6f9;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    padding: 25px 40px;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: 600;
+    color: #444;
+    display: block;
+    margin-top: 10px;
+}
+
+select, input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+button {
+    background-color: #1e88e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0d47a1;
+}
+
+.button-container {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.total-box {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: right;
+    margin-top: 10px;
+    color: #222;
+}
+
+.message {
+    text-align: center;
+    color: green;
+    font-weight: 500;
+    margin-top: 15px;
+}
+
+@media (max-width: 600px) {
+    .container {
+        width: 95%;
+        padding: 20px;
+    }
+    h2 {
+        font-size: 20px;
+    }
+    button {
+        width: 100%;
+    }
+}
