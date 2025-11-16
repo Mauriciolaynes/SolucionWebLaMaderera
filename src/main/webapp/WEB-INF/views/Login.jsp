@@ -15,14 +15,15 @@
     <c:url var="homeUrl" value="/" />
     <c:url var="registrarUrl" value="/registrar" />
 
-	<c:if test="${not empty error}">
-	    <div class="error">${error}</div>
-	</c:if>
-	<c:if test="${not empty exito}">
-	    <div class="exito">${exito}</div>
-	</c:if>
     <%-- Apuntamos la acción al controlador de login que crearemos más adelante --%>
     <form class="login" action="<c:url value='/login'/>" method="post">
+        
+        <c:if test="${not empty error}">
+            <div class="error">${error}</div>
+        </c:if>
+        <c:if test="${not empty exito}">
+            <div class="exito">${exito}</div>
+        </c:if>
         
         <h1>Iniciar Sesión</h1>
         <label for="usuario">Usuario: </label>

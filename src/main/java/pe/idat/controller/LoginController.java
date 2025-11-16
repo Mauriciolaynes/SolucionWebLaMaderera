@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
 import pe.idat.entity.Usuario;
@@ -22,7 +23,7 @@ public class LoginController {
     public String login(
             @RequestParam("usuario") String usuario,
             @RequestParam("contrasena") String contrasena,
-            Model model,
+            RedirectAttributes redirectAttributes,
             HttpSession session) {
 
         // Buscar usuario por correo y contraseña
@@ -40,20 +41,20 @@ public class LoginController {
             } else if ("CLIENTE".equalsIgnoreCase(rol)) {
                 return "redirect:/";
             } else {
-                model.addAttribute("error", "Rol no autorizado");
-                return "login";
+                redirectAttributes.addFlashAttribute("error", "Rol no autorizado");
+                return "redirect:/login";
             }
         }  else {
             // Verificar si el usuario existe
             Usuario usuarioExistente = usuarioRepo.findByCorreo(usuario);
 
             if (usuarioExistente == null) {
-                model.addAttribute("error", "El usuario no está registrado");
+                redirectAttributes.addFlashAttribute("error", "El usuario no está registrado");
             } else {
-                model.addAttribute("error", "Contraseña incorrecta");
+                redirectAttributes.addFlashAttribute("error", "Contraseña incorrecta");
             }
 
-            return "Login";
+            return "redirect:/login";
         }
     }
 

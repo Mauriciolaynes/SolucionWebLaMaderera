@@ -2,6 +2,17 @@
 body {
     position: relative; /* Requerido por Scrollspy de Bootstrap */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Una fuente más moderna */
+
+    /* --- INICIO: Fondo con degradado e imagen --- */
+    /* El degradado se superpone a la imagen. Ajusta los colores y la opacidad (el cuarto valor en rgba) como prefieras. */
+    background: linear-gradient(rgb(255, 255, 255), rgba(0, 0, 0, 0.5)), url('../imagenes/Fondo/Maderera-Foto.png');
+
+    /* Propiedades para asegurar que el fondo cubra toda la pantalla y se mantenga fijo */
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    /* --- FIN: Fondo con degradado e imagen --- */
 }
 
 /* Estilos para los títulos de sección (h2) */
