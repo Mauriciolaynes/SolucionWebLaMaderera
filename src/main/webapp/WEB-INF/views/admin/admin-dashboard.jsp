@@ -39,25 +39,25 @@
             <div class="info-card">
                 <i class="fas fa-boxes card-icon"></i>
                 <div class="card-title">Total Productos</div>
-                <div class="card-value">0</div> 
+                <div class="card-value"><c:out value="${totalProductos}"/></div> 
                 </div>
 
             <div class="info-card green">
                 <i class="fas fa-truck card-icon"></i>
                 <div class="card-title">Total Proveedores</div>
-                <div class="card-value">0</div>
+                <div class="card-value"><c:out value="${totalProveedores}"/></div>
                 </div>
             
             <div class="info-card red">
                 <i class="fas fa-exclamation-triangle card-icon"></i>
                 <div class="card-title">Alertas de Stock</div>
-                <div class="card-value">0</div> 
+                <div class="card-value"><c:out value="${alertasStock}"/></div> 
                 </div>
 
             <div class="info-card yellow">
                 <i class="fas fa-users card-icon"></i>
                 <div class="card-title">Usuarios Activos</div>
-                <div class="card-value">0</div>
+                <div class="card-value"><c:out value="${usuariosActivos}"/></div>
                 </div>
             
         </div>
@@ -83,10 +83,10 @@
                 <tbody>
                     <c:forEach var="producto" items="${productosBajoStock}">
                         <tr>
-                            <td><c:out value="${producto.codigo}"/></td>
-                            <td><c:out value="${producto.nombre}"/></td>
-                            <td><c:out value="${producto.stock}"/></td>
-                            <td><a href="${pageContext.request.contextPath}/inventario/reabastecer?id=<c:out value="${producto.id}"/>" class="btn-action">Reabastecer</a></td>
+                            <td><c:out value="${producto.producto.codigo}"/></td>
+                            <td><c:out value="${producto.producto.nombre}"/></td>
+                            <td><c:out value="${producto.stockActual}"/></td>
+                            <td><a href="${pageContext.request.contextPath}/inventario/reabastecer?id=<c:out value="${producto.producto.id_producto}"/>" class="btn-action">Reabastecer</a></td>
                         </tr>
                     </c:forEach>
                     

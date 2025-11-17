@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pe.idat.entity.Rol;
+import pe.idat.entity.AlmacenProducto;
 import pe.idat.entity.Usuario;
+import pe.idat.repository.AlmacenProductoRepository;
+import pe.idat.repository.ProductoRepository;
+import pe.idat.repository.ProveedorRepository;
 import pe.idat.repository.RolRepository;
 import pe.idat.repository.UsuarioRepository;
 
@@ -24,12 +28,41 @@ public class AdminController {
 
     @Autowired
     private RolRepository rolRepo;
+    
+    @Autowired
+    private ProductoRepository productoRepo;
+
+    @Autowired
+    private ProveedorRepository proveedorRepo;
+    
+    @Autowired
+    private AlmacenProductoRepository almacenProductoRepo;
 
     // --- DASHBOARD ADMIN ---
     @GetMapping("/admin/admin-dashboard")
-    public String mostrarDashboard() {
+    public String mostrarDashboard(Model model) {
+    	// Definimos un umbral para considerar el stock como bajo
+        int umbralStockBajo = 20;
+
+    	// Obtenemos los totales de los repositorios
+        long totalProductos = productoRepo.count();
+        long totalProveedores = proveedorRepo.count();
+        long usuariosActivos = usuarioRepo.countByEstado(1);
+        
+        // Lógica correcta para obtener stock desde AlmacenProducto
+        List<AlmacenProducto> stockBajoEntries = almacenProductoRepo.findByStockActualLessThan(umbralStockBajo);
+        long alertasStock = stockBajoEntries.size();
+        List<AlmacenProducto> productosBajoStock = stockBajoEntries;
+        
+        model.addAttribute("totalProductos", totalProductos);
+        model.addAttribute("totalProveedores", totalProveedores);
+        model.addAttribute("usuariosActivos", usuariosActivos);
+        model.addAttribute("alertasStock", alertasStock);
+        model.addAttribute("productosBajoStock", productosBajoStock);
+        
         return "admin/admin-dashboard"; // JSP: WEB-INF/views/admin/admin-dashboard.jsp
     }
+
 
     // --- GESTIÓN DE EMPLEADOS ---
     @GetMapping("/admin/form-empleado")

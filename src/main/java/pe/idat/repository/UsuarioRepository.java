@@ -30,4 +30,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
     // Buscar por nombre y rol
     List<Usuario> findByNombresApellidosContainingIgnoreCaseAndRolIdRol(String nombre, Integer idRol);
+    
+    long countByEstado(int estado);
+
 }

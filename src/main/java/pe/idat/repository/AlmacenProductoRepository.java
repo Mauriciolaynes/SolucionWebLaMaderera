@@ -10,6 +10,7 @@ public interface AlmacenProductoRepository extends JpaRepository<AlmacenProducto
 	List<AlmacenProducto> findById_IdAlmacen(Integer idAlmacen); // mejor que findByIdIdAlmacen
     List<AlmacenProducto> findByProducto_Categoria_IdCategoria(Integer idCategoria);
     Optional<AlmacenProducto> findById_IdProducto(Integer idProducto);
+    List<AlmacenProducto> findByStockActualLessThan(int stock);
 
 
 }

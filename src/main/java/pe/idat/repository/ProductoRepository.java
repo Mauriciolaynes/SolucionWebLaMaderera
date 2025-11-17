@@ -21,6 +21,4 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
     Producto findTopByCategoriaIdCategoriaOrderByIdDesc(@Param("idCategoria") Integer idCategoria);
 
 
-
-
 }
