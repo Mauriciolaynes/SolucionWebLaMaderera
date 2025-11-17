@@ -35,7 +35,7 @@ public class ProveedorController {
 
     // Guardar o actualizar
     @PostMapping("/guardar")
-    public String guardarProveedor(@Valid @ModelAttribute("id_proveedor") Proveedor proveedor,
+    public String guardarProveedor(@Valid @ModelAttribute("proveedor") Proveedor proveedor,
                                    BindingResult result, Model model) {
 
         if (result.hasErrors()) {

@@ -1,0 +1,162 @@
+/* =========================================
+   INTEGRACIÓN DE ESTILOS BASE Y CENTRADO
+========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* Usamos Inter, la fuente del dashboard */
+    font-family: 'Inter', sans-serif; 
+    background-color: #f0f2f5; 
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh; 
+    display: flex; 
+    justify-content: center; /* Centra horizontalmente el form-wrapper */
+    align-items: center; /* Centra verticalmente el form-wrapper */
+    padding: 20px; 
+}
+
+/* =========================================
+   CONTENEDOR DEL FORMULARIO Y TÍTULO (Ancho Ajustado)
+========================================= */
+.form-wrapper {
+    /* ANCHO AJUSTADO: Un poco más ancho (650px) para acomodar bien las 2 columnas */
+    max-width: 650px; 
+    width: 100%;
+    margin: auto;
+    padding-top: 20px; 
+}
+
+/* =========================================
+   TÍTULO CENTRADO
+========================================= */
+h2 {
+    color: #2c3e50; 
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 20px; 
+    text-align: center; 
+    padding-bottom: 5px;
+}
+
+/* =========================================
+   CONTENEDOR FORMULARIO (Sombra y Fondo)
+========================================= */
+form {
+    background-color: #ffffff;
+    padding: 40px; 
+    border-radius: 12px;
+    width: 100%; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+    overflow-y: auto; 
+    max-height: 95vh;
+}
+
+/* =========================================
+   LAYOUT DE 2 COLUMNAS
+========================================= */
+.form-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px 30px; 
+    margin-bottom: 20px;
+}
+
+/* =========================================
+   CAMPOS DEL FORMULARIO (Tipografía y Diseño)
+========================================= */
+label {
+    display: block;
+    margin-top: 0; 
+    font-weight: 600; /* Asegura que la letra se vea fuerte */
+    color: #2c3e50;
+    margin-bottom: 5px;
+    font-size: 0.95rem;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px; 
+    margin-top: 5px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s;
+    font-size: 1rem; /* Asegura el tamaño de la letra */
+    font-family: 'Inter', sans-serif; /* Aplica la fuente Inter también a los campos */
+}
+
+input:focus, select:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* =========================================
+   BOTONES Y GRUPO DE BOTONES (Diseño Recupeado)
+========================================= */
+.button-group {
+    grid-column: 1 / span 2; /* Ocupa las dos columnas */
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end; 
+    margin-top: 20px;
+}
+
+button[type="submit"] {
+    /* Botón primario (Guardar) */
+    background-color: #3498db; /* Azul del dashboard */
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+
+button[type="submit"]:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.btn-cancelar {
+    /* Botón secundario (Cancelar) */
+    background-color: #95a5a6; /* Gris neutro */
+    color: white;
+    padding: 10px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-cancelar:hover {
+    background-color: #7f8c8d;
+}
+
+/* Estilos para mensajes de alerta (para completitud) */
+.mensaje-error {
+    color: #e74c3c; 
+    background-color: #fde8e8; 
+    padding: 15px; 
+    border-radius: 8px; 
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.mensaje-exito {
+    color: #2ecc71; 
+    background-color: #e6f7e8; 
+    padding: 15px; 
+    border-radius: 8px; 
+    margin-bottom: 20px;
+    font-weight: 500;
+}

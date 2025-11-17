@@ -1,59 +1,80 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-
+<!DOCTYPE html>
 <html>
 <head>
     <title>Editar Producto</title>
-    <link rel="stylesheet" href="<c:url value='/Styles/forms.css'/>">
+    <link rel="stylesheet" href="<c:url value='/Styles/registrar.css'/>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
-<h2>Editar Producto</h2>
+    <div class="form-wrapper">
 
-	<c:if test="${not empty error}">
-        <div class="alert alert-danger">${error}</div>
-    </c:if>
-    <c:if test="${not empty exito}">
-        <div class="alert alert-success">${exito}</div>
-    </c:if>
+        <h2>Editar Producto</h2>
 
-<form:form method="post" modelAttribute="producto"
-           action="${pageContext.request.contextPath}/productos/guardar">
+        <c:if test="${not empty error}">
+            <div class="mensaje-error">
+                <i class="fas fa-exclamation-circle"></i> ${error}
+            </div>
+        </c:if>
+        <c:if test="${not empty exito}">
+            <div class="mensaje-exito">
+                <i class="fas fa-check-circle"></i> ${exito}
+            </div>
+        </c:if>
 
-    <!-- Campo oculto para ID -->
-    <form:hidden path="id_producto" />
-    <form:hidden path="codigo" />
+        <form:form method="post" modelAttribute="producto"
+                   action="${pageContext.request.contextPath}/productos/guardar">
 
-    <label>Nombre:</label>
-    <form:input path="nombre" required="true"/><br>
+            <form:hidden path="id_producto" />
+            <form:hidden path="codigo" />
 
-    <label>Descripción:</label>
-    <form:textarea path="descripcion"/><br>
+            <div class="form-grid-2">
 
-    <label>Precio Compra:</label>
-    <form:input path="precio_compra" type="number" step="0.01" required="true"/><br>
+                <div>
+                    <label for="nombre">Nombre:</label>
+                    <form:input path="nombre" required="true"/>
+                </div>
+                <div>
+                    <label for="precio_compra">Precio Compra:</label>
+                    <form:input path="precio_compra" type="number" step="0.01" required="true"/>
+                </div>
+                <div>
+                    <label for="precio_venta">Precio Venta:</label>
+                    <form:input path="precio_venta" type="number" step="0.01" required="true"/>
+                </div>
+                <div>
+                    <label for="categoria.idCategoria">Categoría:</label>
+                    <form:select path="categoria.idCategoria" required="true">
+                        <form:options items="${categorias}" itemValue="idCategoria" itemLabel="nombre" />
+                    </form:select>
+                </div>
 
-    <label>Precio Venta:</label>
-    <form:input path="precio_venta" type="number" step="0.01" required="true"/><br>
+                <div>
+                    <label for="descripcion">Descripción:</label>
+                    <form:textarea path="descripcion" rows="5"/>
+                </div>
+                <div>
+                    <label for="proveedor">Proveedor:</label>
+                    <form:select path="proveedor.idProveedor" required="true">
+                        <form:options items="${proveedores}" itemValue="idProveedor" itemLabel="nombre" />
+                    </form:select>
+                </div>
+                <div></div>
+                <div></div>
+                
 
-    <label>Categoría:</label>
-    <form:select path="categoria.idCategoria" cssClass="form-select" required="true">
-        <form:options items="${categorias}" itemValue="idCategoria" itemLabel="nombre" />
-    </form:select><br>
-
-    <label>Proveedor:</label>
-    <form:select path="proveedor" cssClass="form-select" required="true">
-        <form:options items="${proveedores}" itemValue="idProveedor" itemLabel="nombre" />
-    </form:select><br>
-
-    <button type="submit">Actualizar</button>
-    <button type="button"
-            onclick="window.location.href='${pageContext.request.contextPath}/productos/listar'">
-        Cancelar
-    </button>
-
-</form:form>
-
-</body>
+            </div> <div class="button-group">
+                <a href="${pageContext.request.contextPath}/productos/listar" class="btn-cancelar">
+                    <i class="fas fa-times-circle"></i> Cancelar
+                </a>
+                <button type="submit">
+                    <i class="fas fa-save"></i> Actualizar
+                </button>
+            </div>
+        </form:form>
+    </div> </body>
 </html>

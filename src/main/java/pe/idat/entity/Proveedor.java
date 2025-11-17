@@ -6,27 +6,31 @@ import jakarta.validation.constraints.*;
 @Entity
 @Table(name = "proveedor")
 public class Proveedor {
-	 @Id
+		@Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Integer id_proveedor;
-
+	
 	    @NotBlank(message = "El nombre es obligatorio")
+	    @Pattern(regexp = "^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$", 
+	             message = "El nombre solo debe contener letras")
 	    private String nombre;
-
+	
 	    @NotBlank(message = "El RUC es obligatorio")
-	    @Size(min = 11, max = 11, message = "El RUC debe tener 11 dígitos")
+	    @Size(min = 11, max = 11, message = "El RUC debe tener 11 dígitos")	             
 	    private String ruc;
-
+	
 	    @NotBlank(message = "El teléfono es obligatorio")
+	    @Pattern(regexp = "^[0-9]{6,9}$",
+	             message = "El teléfono debe tener entre 6 y 9 dígitos")
 	    private String telefono;
-
+	
 	    @Email(message = "El correo no es válido")
 	    @NotBlank(message = "El correo es obligatorio")
 	    private String correo;
-
+	
 	    @NotBlank(message = "La dirección es obligatoria")
 	    private String direccion;
-
+	
 	    private Boolean estado = true;
 
 	    // Getters y Setters
