@@ -227,9 +227,9 @@
                     <ul class="list-unstyled">
                         <li><a href="#">Teléfono Lima (01)500-5540</a></li>
                         <li class="mt-2">
-                            <a href="#">Libro de Reclamaciones</a>
+                            <a href="<c:url value='/libro-reclamaciones'/>">Libro de Reclamaciones</a>
                             <%-- Aquí se añade la imagen del libro de reclamaciones --%>
-                            <a href="#"><img src="<c:url value='/imagenes/Iconos/libro-de-reclamaciones.png'/>" alt="Libro de Reclamaciones" style="max-width: 120px; margin-top: 8px; display: block;"></a>
+                            <a href="<c:url value='/libro-reclamaciones'/>"><img src="<c:url value='/imagenes/Iconos/libro-de-reclamaciones.png'/>" alt="Libro de Reclamaciones" style="max-width: 120px; margin-top: 8px; display: block;"></a>
                         </li>
                     </ul>
                 </div>

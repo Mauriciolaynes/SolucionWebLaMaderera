@@ -1,0 +1,110 @@
+@charset "UTF-8";
+
+/* Estilos generales del cuerpo */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Título principal */
+h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 2.2em;
+    font-weight: 600;
+}
+
+/* Contenedor del formulario */
+form {
+    background: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 750px;
+}
+
+/* Títulos de las secciones */
+h3 {
+    color: #34495e;
+    border-bottom: 2px solid #1abc9c;
+    padding-bottom: 10px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    font-size: 1.6em;
+}
+
+/* Etiquetas de los campos */
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+    font-size: 1em;
+}
+
+/* Campos de entrada, selectores y áreas de texto */
+input[type="text"],
+input[type="email"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+    font-size: 1em;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Efecto de foco para los campos */
+input[type="text"]:focus,
+input[type="email"]:focus,
+select:focus,
+textarea:focus {
+    border-color: #1abc9c;
+    box-shadow: 0 0 8px rgba(26, 188, 156, 0.2);
+    outline: none;
+}
+
+/* Estilo específico para las áreas de texto */
+textarea {
+    resize: vertical; /* Permite redimensionar verticalmente */
+    min-height: 120px;
+}
+
+/* Botón de envío */
+button[type="submit"] {
+    width: 100%;
+    padding: 15px;
+    background-color: #1abc9c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 20px;
+}
+
+/* Efecto hover para el botón */
+button[type="submit"]:hover {
+    background-color: #16a085;
+    transform: translateY(-2px);
+}
+
+/* Efecto activo para el botón */
+button[type="submit"]:active {
+    background-color: #148f77;
+    transform: translateY(0);
+}
