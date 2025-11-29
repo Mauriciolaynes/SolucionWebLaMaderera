@@ -4,8 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.idat.entity.PedidoCompra;
+import java.util.List;
 import pe.idat.repository.PedidoCompraRepository;
-
+import org.springframework.transaction.annotation.Propagation;
 import java.time.LocalDate;
 
 @Service
@@ -14,18 +15,43 @@ public class PedidoCompraService {
     @Autowired
     private PedidoCompraRepository pedidoCompraRepository;
 
-    @Transactional
+    // --- MÉTODO NUEVO PARA LISTAR ---
+    @Transactional(readOnly = true) // Es una buena práctica para operaciones de solo lectura
+    public List<PedidoCompra> listarTodos() {
+        return pedidoCompraRepository.findAll();
+    }
+
+    // --- MÉTODO NUEVO PARA EL DASHBOARD ---
+    @Transactional(readOnly = true)
+    public List<PedidoCompra> listarUltimos5Pedidos() {
+        return pedidoCompraRepository.findTop5ByOrderByIdPedidoCompraDesc();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public PedidoCompra crearPedido(PedidoCompra pedidoCompra) {
         // Criterio de Aceptación: El pedido debe tener un estado inicial “Pendiente”.
         pedidoCompra.setEstado("Pendiente");
 
-        // ¡CORRECCIÓN! Se usa el método correcto 'setFechaPedido'.
+        // Asignar fecha actual
         pedidoCompra.setFechaPedido(LocalDate.now());
 
-        // Criterio de Aceptación: El pedido debe generar un número único y consecutivo.
+        // Generar número correlativo
         pedidoCompra.setNumeroPedido(generarSiguienteNumeroPedido());
 
-        return pedidoCompraRepository.save(pedidoCompra);
+        // --- [NUEVO BLOQUE CRÍTICO] VINCULACIÓN DE SEGURIDAD ---
+        // Recorremos los detalles y les decimos explícitamente: "Este es tu padre"
+        if (pedidoCompra.getDetalles() != null) {
+            for (pe.idat.entity.PedidoCompraDetalle detalle : pedidoCompra.getDetalles()) {
+                detalle.setPedidoCompra(pedidoCompra); 
+            }
+        }
+        // GUARDADO
+            PedidoCompra pedidoGuardado = pedidoCompraRepository.save(pedidoCompra);
+            
+            // *** TRUCO DE DEBUG: Forzar que se vea el ID generado ***
+            System.out.println("DEBUG: Pedido guardado con ID: " + pedidoGuardado.getIdPedidoCompra());
+            
+            return pedidoGuardado;
     }
 
     private String generarSiguienteNumeroPedido() {

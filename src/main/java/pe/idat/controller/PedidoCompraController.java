@@ -2,8 +2,8 @@ package pe.idat.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,18 +11,21 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import pe.idat.dto.ProductoDTO;
 import pe.idat.entity.PedidoCompra;
 import pe.idat.entity.PedidoCompraDetalle;
 import pe.idat.entity.Producto;
 import pe.idat.entity.Proveedor;
-import pe.idat.dto.ProductoDTO;
 import pe.idat.repository.ProductoRepository;
 import pe.idat.repository.ProveedorRepository;
 import pe.idat.service.PedidoCompraService;
 
 @Controller
 @RequestMapping("/pedidos-compra")
-@SessionAttributes("pedidoEnProceso") 
+@SessionAttributes("pedidoEnProceso") // ¡Vital! Mantiene el objeto vivo entre el Resumen y el Guardado final
 public class PedidoCompraController {
 
     @Autowired
@@ -35,142 +38,166 @@ public class PedidoCompraController {
     private ProductoRepository productoRepository;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper; // Para convertir a JSON
 
     /**
-     * Muestra el formulario inicial para crear un nuevo pedido.
-     * Carga los proveedores y productos, y convierte la lista de productos a JSON.
+     * PASO 1: Mostrar el formulario vacío.
+     * Carga proveedores y la lista de productos en formato JSON para el JavaScript.
      */
     @GetMapping("/nuevo")
     public String mostrarFormularioNuevo(Model model, RedirectAttributes flash) {
-        // Enviamos la lista de todos los proveedores para el selector principal
+        // 1. Cargar Proveedores para el select
         model.addAttribute("proveedores", proveedorRepository.findAll());
         
         try {
-            // 1. Obtenemos la lista completa de productos usando FETCH JOIN 
-            List<Producto> listaProductosCompleta = productoRepository.findAllWithProveedor();
+            // 2. Cargar Productos (optimizada con Fetch Join si lo tienes, sino findAll normal)
+            // Nota: Asegúrate de que tu repositorio tenga este método o usa findAll()
+            List<Producto> listaProductosCompleta = productoRepository.findAll(); 
             
-            // 2. Creamos una lista de DTOs
+            // 3. Transformar a DTO para enviar solo lo necesario al JSON (ID, Nombre, Precio, ID_Proveedor)
             List<ProductoDTO> listaProductosDTO = new ArrayList<>();
 
-            // 3. Convertimos cada Producto a un ProductoDTO.
             for (Producto producto : listaProductosCompleta) {
                 
-                // *** 💡 DEPURA EL NOMBRE EN LA CONSOLA DEL SERVIDOR ***
-                System.out.println("DEBUG - Producto ID: " + producto.getIdProducto() + " | Nombre de la BD: [" + producto.getNombre() + "]");
-                
-                // *** CORRECCIÓN TEMPORAL: Manejar nombres nulos/vacíos ***
+                // Validación de nombre nulo para evitar errores en el JS
                 String nombreProducto = producto.getNombre();
                 if (nombreProducto == null || nombreProducto.trim().isEmpty()) {
                     nombreProducto = "PRODUCTO SIN NOMBRE (ID: " + producto.getIdProducto() + ")";
                 }
 
-                // El Proveedor ya está cargado gracias a 'findAllWithProveedor'.
+                // Evitar NullPointer si el producto no tiene proveedor asignado
                 Integer idProveedor = (producto.getProveedor() != null) ? producto.getProveedor().getIdProveedor() : null;
                 
                 listaProductosDTO.add(new ProductoDTO(
                     producto.getIdProducto(),
-                    nombreProducto, // Usamos la variable corregida
+                    nombreProducto, 
                     producto.getPrecioCompra(),
                     idProveedor
                 ));
             }
 
-            // 4. Convertimos la lista de DTOs a JSON.
+            // 4. Convertir la lista DTO a String JSON
             String productosJson = objectMapper.writeValueAsString(listaProductosDTO);
             model.addAttribute("productosJson", productosJson);
+
         } catch (JsonProcessingException e) {
-            // En caso de error, enviamos un JSON vacío
-            System.err.println("Error al serializar productos a JSON: " + e.getMessage());
-            flash.addFlashAttribute("error", "No se pudieron cargar los productos para la selección.");
-            model.addAttribute("productosJson", "[]");
+            System.err.println("Error al crear JSON de productos: " + e.getMessage());
+            model.addAttribute("productosJson", "[]"); // Enviar array vacío para que no rompa el JS
+            model.addAttribute("error", "Error cargando lista de productos.");
         }
         
-        // El nombre de la vista JSP
-        return "pedidos_compra/crear-pedido"; 
-        
+        // Si no hay un objeto previo en el modelo, creamos uno nuevo
+        if (!model.containsAttribute("pedidoEnProceso")) {
+            model.addAttribute("pedidoEnProceso", new PedidoCompra());
+        }
+
+        return "pedidos_compra/crear-pedido"; // Tu JSP del formulario
     }
 
     /**
-     * Procesa los datos del formulario de creación y prepara el resumen.
+     * PASO 2: Recibir los datos del formulario, validar y preparar el Resumen.
+     * Aquí NO se guarda en BD todavía, solo se prepara la vista previa.
      */
     @PostMapping("/resumen")
     public String procesarResumen(@ModelAttribute PedidoCompra pedido, 
-                                 Model model, 
-                                 RedirectAttributes flash) {
+                                  Model model, 
+                                  RedirectAttributes flash) {
 
-        // --- VALIDACIÓN DE PRODUCTOS ---
-        if (pedido.getDetalles() == null || pedido.getDetalles().isEmpty()) {
-            flash.addFlashAttribute("error", "No se puede generar un resumen sin productos. Por favor, añada al menos un item.");
-            return "redirect:/pedidos-compra/nuevo";
+        // --- A. VALIDACIÓN BÁSICA DE LA LISTA ---
+        // Eliminar filas que puedan venir vacías o nulas por error del frontend
+        if (pedido.getDetalles() != null) {
+            pedido.getDetalles().removeIf(d -> 
+                d.getProducto() == null || d.getProducto().getIdProducto() == null
+            );
         }
 
-        // Remover detalles donde no se seleccionó un producto.
-        pedido.getDetalles().removeIf(d -> d.getProducto() == null || d.getProducto().getIdProducto() == null);
-
-        if (pedido.getDetalles().isEmpty()) {
-            flash.addFlashAttribute("error", "El pedido debe tener al menos un producto válido seleccionado.");
+        if (pedido.getDetalles() == null || pedido.getDetalles().isEmpty()) {
+            flash.addFlashAttribute("error", "Debe agregar al menos un producto válido al pedido.");
             return "redirect:/pedidos-compra/nuevo";
         }
 
         try {
-            // 1. Cargar el objeto Proveedor completo desde la base de datos
+            // --- B. HIDRATACIÓN DE DATOS (Recuperar objetos completos desde la BD) ---
+            
+            // 1. Recuperar Proveedor completo (el formulario solo mandó el ID)
             Proveedor proveedor = proveedorRepository.findById(pedido.getProveedor().getIdProveedor())
-                    .orElseThrow(() -> new IllegalArgumentException("Proveedor no válido:" + pedido.getProveedor().getIdProveedor()));
+                    .orElseThrow(() -> new IllegalArgumentException("Proveedor no encontrado"));
             pedido.setProveedor(proveedor);
 
-            // 2. Para cada detalle, cargar el objeto Producto completo
+            // 2. Establecer ESTADO INICIAL
+            pedido.setEstado("PENDIENTE");
+
+            // 3. Procesar cada detalle
+            double totalCalculado = 0.0;
+
             for (PedidoCompraDetalle detalle : pedido.getDetalles()) {
-                Producto producto = productoRepository.findById(detalle.getProducto().getIdProducto())
-                        .orElseThrow(() -> new IllegalArgumentException("Producto no válido:" + detalle.getProducto().getIdProducto()));
-                detalle.setProducto(producto);
-                // Establecer la relación bidireccional
+                // Recuperar Producto completo para tener el nombre y precio real
+                Producto productoBD = productoRepository.findById(detalle.getProducto().getIdProducto())
+                        .orElseThrow(() -> new IllegalArgumentException("Producto no existe ID: " + detalle.getProducto().getIdProducto()));
+                
+                detalle.setProducto(productoBD);
+                
+                // Asegurar que el precio venga del formulario o de la BD (según tu lógica)
+                if (detalle.getPrecioCompra() == null) {
+                    detalle.setPrecioCompra(productoBD.getPrecioCompra());
+                }
+
+                // *** CRUCIAL: RELACIÓN BIDIRECCIONAL ***
+                // Esto le dice al hijo "Tu padre es este pedido". Sin esto, no se guardan los hijos.
                 detalle.setPedidoCompra(pedido);
+
+                // Calcular subtotal para el total general
+                totalCalculado += (detalle.getCantidad() * detalle.getPrecioCompra());
             }
 
-            // 3. Poner el objeto en el modelo para que @SessionAttributes lo guarde en la sesión
+            pedido.setTotal(totalCalculado);
+
+            // --- C. GUARDAR EN SESIÓN Y REDIRIGIR ---
+            // Al agregar 'pedido' al modelo, @SessionAttributes lo captura automáticamente.
             model.addAttribute("pedidoEnProceso", pedido);
 
-            // 4. Redirigir a la URL que mostrará el resumen
             return "redirect:/pedidos-compra/resumen-vista";
 
         } catch (Exception e) {
-            flash.addFlashAttribute("error", "Ocurrió un error al procesar el pedido: " + e.getMessage());
+            e.printStackTrace();
+            flash.addFlashAttribute("error", "Error procesando el resumen: " + e.getMessage());
             return "redirect:/pedidos-compra/nuevo";
         }
     }
 
     /**
-     * Muestra la página de resumen, recuperando el pedido de la sesión.
+     * PASO 3: Mostrar la vista JSP del Resumen.
+     * Recupera 'pedidoEnProceso' automáticamente de la sesión.
      */
     @GetMapping("/resumen-vista")
     public String mostrarResumenVista(@ModelAttribute("pedidoEnProceso") PedidoCompra pedido, Model model) {
-        return "pedidos_compra/resumen-pedido";
+        // Aquí el objeto 'pedido' ya viene lleno con lo que hicimos en el paso anterior.
+        return "pedidos_compra/resumen-pedido"; // Tu JSP de resumen
     }
 
-
     /**
-     * Guarda el pedido de la sesión en la base de datos y limpia la sesión.
+     * PASO 4: Guardar definitivamente en la Base de Datos.
      */
     @PostMapping("/guardar")
     public String guardarPedidoConfirmado(@ModelAttribute("pedidoEnProceso") PedidoCompra pedido,
-                                         RedirectAttributes flash,
-                                         SessionStatus status) {
+                                          RedirectAttributes flash,
+                                          SessionStatus status) {
         try {
-            // El objeto 'pedido' viene completo desde la sesión
+            // El objeto 'pedido' viene completo de la sesión (con detalles, proveedor y estado).
+            
+            // 1. Guardar en BD (El CascadeType.ALL en la entidad guardará los detalles automáticamente)
             pedidoCompraService.crearPedido(pedido);
 
-            // Limpiar el objeto de la sesión
+            // 2. Limpiar la sesión para que el formulario vuelva a estar vacío la próxima vez
             status.setComplete();
 
-            flash.addFlashAttribute("success", "Pedido de compra creado con éxito. Número de pedido: " + pedido.getNumeroPedido());
+            flash.addFlashAttribute("success", "¡Pedido guardado con éxito! Nro: " + pedido.getNumeroPedido());
             return "redirect:/pedidos-compra/nuevo";
 
         } catch (Exception e) {
-            flash.addFlashAttribute("error", "Error al guardar el pedido: " + e.getMessage());
-            return "redirect:/pedidos-compra/resumen-vista";
+            e.printStackTrace();
+            flash.addFlashAttribute("error", "Error crítico al guardar en BD: " + e.getMessage());
+            return "redirect:/pedidos-compra/resumen-vista"; // Volver al resumen si falla
         }
-        
     }
-    
 }

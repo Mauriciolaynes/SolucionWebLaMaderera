@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -102,6 +103,41 @@
                         <td>25</td>
                         <td><button class="btn-small">Ver</button></td>
                     </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <%-- SECCIÓN AÑADIDA: ÚLTIMOS PEDIDOS DE COMPRA --%>
+        <section>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>Últimos Pedidos de Compra</h3>
+                <a href="${pageContext.request.contextPath}/admin/pedidos-compra" class="btn-small">Ver Todos</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>N° Pedido</th>
+                        <th>Proveedor</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach items="${pedidosRecientes}" var="pedido">
+                        <tr>
+                            <td><c:out value="${pedido.numeroPedido}"/></td>
+                            <td><c:out value="${pedido.proveedor.nombre}"/></td>
+                            <td><c:out value="${pedido.fechaPedido}"/></td>
+                            <td><span class="badge" style="background-color: #3498db; color: white; padding: 5px 10px; border-radius: 12px;"><c:out value="${pedido.estado}"/></span></td>
+                            <td style="text-align: right;">S/ <fmt:formatNumber value="${pedido.total}" type="number" minFractionDigits="2" maxFractionDigits="2"/></td>
+                        </tr>
+                    </c:forEach>
+                    <c:if test="${empty pedidosRecientes}">
+                        <tr>
+                            <td colspan="5" style="text-align: center;">No hay pedidos de compra recientes.</td>
+                        </tr>
+                    </c:if>
                 </tbody>
             </table>
         </section>

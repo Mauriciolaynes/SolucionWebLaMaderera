@@ -2,7 +2,6 @@ package pe.idat.entity;
 
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import java.util.List;
 import java.time.LocalDateTime;

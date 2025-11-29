@@ -38,9 +38,14 @@ public class PedidoCompra {
     private List<PedidoCompraDetalle> detalles = new ArrayList<>();
 
     @PrePersist
-    protected void onCreate() {
-        this.fechaPedido = LocalDate.now();
-    }
+        protected void onCreate() {
+            this.fechaPedido = LocalDate.now();
+            
+            // --- NUEVO: Asignar estado por defecto si no tiene uno ---
+            if (this.estado == null || this.estado.isEmpty()) {
+                this.estado = "GENERADO"; // O "PENDIENTE", según tu lógica de negocio
+            }
+        }
 
     // --- GETTERS Y SETTERS ---
 

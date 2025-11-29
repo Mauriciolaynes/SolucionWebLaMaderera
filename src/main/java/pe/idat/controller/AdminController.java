@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import pe.idat.entity.PedidoCompra;
 import pe.idat.entity.Rol;
 import pe.idat.entity.AlmacenProducto;
 import pe.idat.entity.Usuario;
@@ -20,6 +21,7 @@ import pe.idat.repository.ProductoRepository;
 import pe.idat.repository.ProveedorRepository;
 import pe.idat.repository.RolRepository;
 import pe.idat.repository.UsuarioRepository;
+import pe.idat.service.PedidoCompraService;
 
 @Controller
 public class AdminController {
@@ -37,6 +39,9 @@ public class AdminController {
     
     @Autowired
     private AlmacenProductoRepository almacenProductoRepo;
+
+    @Autowired
+    private PedidoCompraService pedidoCompraService;
 
     // --- REDIRECCIÓN PARA ENLACE INCORRECTO ---
     // Esto captura la petición a "/dashboard" y la redirige a la URL correcta.
@@ -67,6 +72,10 @@ public class AdminController {
         model.addAttribute("usuariosActivos", usuariosActivos);
         model.addAttribute("alertasStock", alertasStock);
         model.addAttribute("productosBajoStock", productosBajoStock);
+
+        // --- NUEVO: Añadir pedidos recientes al dashboard ---
+        List<PedidoCompra> pedidosRecientes = pedidoCompraService.listarUltimos5Pedidos();
+        model.addAttribute("pedidosRecientes", pedidosRecientes);
         
         return "admin/admin-dashboard"; // JSP: WEB-INF/views/admin/admin-dashboard.jsp
     }
@@ -214,5 +223,14 @@ public class AdminController {
         }
         return "redirect:/admin/listar-empleados";
     }
+
+    // --- GESTIÓN DE PEDIDOS DE COMPRA ---
+    @GetMapping("/admin/pedidos-compra")
+    public String listarPedidosCompra(Model model) {
+        List<PedidoCompra> listaPedidos = pedidoCompraService.listarTodos();
+        model.addAttribute("listaPedidos", listaPedidos);
+        return "admin/listado-pedidos"; // Ruta al archivo JSP: /WEB-INF/views/admin/listado-pedidos.jsp
+    }
+
 
 }
