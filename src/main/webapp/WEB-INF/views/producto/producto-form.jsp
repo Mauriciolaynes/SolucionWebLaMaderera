@@ -35,13 +35,14 @@
                     <label for="nombre">Nombre:</label>
                     <form:input path="nombre" required="true"/>
                 </div>
+                <%-- Esta es la corrección --%>
                 <div>
-                    <label for="precio_compra">Precio Compra:</label>
-                    <form:input path="precio_compra" type="number" step="0.01" required="true"/>
+                    <label for="precioCompra">Precio Compra:</label>
+                    <form:input path="precioCompra" type="number" step="0.01" required="true"/>
                 </div>
                 <div>
-                    <label for="precio_venta">Precio Venta:</label>
-                    <form:input path="precio_venta" type="number" step="0.01" required="true"/>
+                    <label for="precioVenta">Precio Venta:</label>
+                    <form:input path="precioVenta" type="number" step="0.01" required="true"/>
                 </div>
                 <div>
                     <label for="categoria.idCategoria">Categoría:</label>
@@ -56,16 +57,15 @@
                     <form:textarea path="descripcion" rows="5"/>
                 </div>
                 <div>
-                    <label for="proveedor">Proveedor:</label>
+                    <label for="proveedor.idProveedor">Proveedor:</label>
                     <form:select path="proveedor.idProveedor" required="true">
                         <option value="">Seleccionar Proveedor</option>
                         <form:options items="${proveedores}" itemValue="idProveedor" itemLabel="nombre" />
                     </form:select>
                 </div>
-                <div></div>
-                <div></div>
-                
-            </div> <div class="button-group">
+
+            </div>
+            <div class="button-group">
                 <a href="${pageContext.request.contextPath}/productos/listar" class="btn-cancelar">
                     <i class="fas fa-times-circle"></i> Cancelar
                 </a>

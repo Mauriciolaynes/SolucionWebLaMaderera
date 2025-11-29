@@ -1,6 +1,8 @@
 package pe.idat.entity;
 
 import jakarta.persistence.*;
+import java.util.List;
+
 import jakarta.validation.constraints.*;
 
 @Entity
@@ -8,7 +10,8 @@ import jakarta.validation.constraints.*;
 public class Proveedor {
 		@Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Integer id_proveedor;
+	    @Column(name = "id_proveedor")
+	    private Integer idProveedor;
 	
 	    @NotBlank(message = "El nombre es obligatorio")
 	    @Pattern(regexp = "^[A-Za-zÁÉÍÓÚáéíóúñÑ ]+$", 
@@ -33,9 +36,12 @@ public class Proveedor {
 	
 	    private Boolean estado = true;
 
+	    @OneToMany(mappedBy = "proveedor")
+	    private List<PedidoCompra> pedidosCompra;
+
 	    // Getters y Setters
-	    public Integer getIdProveedor() { return id_proveedor; }
-	    public void setIdProveedor(Integer id_proveedor) { this.id_proveedor = id_proveedor; }
+	    public Integer getIdProveedor() { return idProveedor; }
+	    public void setIdProveedor(Integer idProveedor) { this.idProveedor = idProveedor; }
 
 	    public String getNombre() { return nombre; }
 	    public void setNombre(String nombre) { this.nombre = nombre; }
@@ -54,5 +60,8 @@ public class Proveedor {
 
 	    public Boolean getEstado() { return estado; }
 	    public void setEstado(Boolean estado) { this.estado = estado; }
+
+		public List<PedidoCompra> getPedidosCompra() { return pedidosCompra; }
+		public void setPedidosCompra(List<PedidoCompra> pedidosCompra) { this.pedidosCompra = pedidosCompra; }
 	
 }

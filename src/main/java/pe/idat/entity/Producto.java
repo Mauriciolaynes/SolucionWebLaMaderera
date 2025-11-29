@@ -2,7 +2,9 @@ package pe.idat.entity;
 
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
+import java.util.List;
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,7 +12,8 @@ import java.time.LocalDateTime;
 public class Producto {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_producto;
+    @Column(name = "id_producto")
+    private Integer idProducto;
 
     
     @Column(unique = true)
@@ -23,11 +26,13 @@ public class Producto {
 
     @NotNull(message = "El precio de compra es obligatorio")
     @DecimalMin(value = "0.0", message = "Debe ser mayor o igual a 0")
-    private Double precio_compra;
+    @Column(name = "precio_compra")
+    private Double precioCompra;
 
     @NotNull(message = "El precio de venta es obligatorio")
     @DecimalMin(value = "0.0", message = "Debe ser mayor o igual a 0")
-    private Double precio_venta;
+    @Column(name = "precio_venta")
+    private Double precioVenta;
 
     @ManyToOne
     @JoinColumn(name = "id_categoria")
@@ -37,23 +42,27 @@ public class Producto {
     @JoinColumn(name = "id_proveedor")
     private Proveedor proveedor;
 
+    @OneToMany(mappedBy = "producto")
+    private List<AlmacenProducto> almacenProductos = new java.util.ArrayList<>(); // ¡ESTA ES LA CORRECCIÓN!
+
     private Integer estado = 1;
 
-    @Column(updatable = false)
-    private LocalDateTime created_at = LocalDateTime.now();
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private LocalDateTime updated_at = LocalDateTime.now();
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     // =======================
     // GETTERS Y SETTERS
     // =======================
 
-    public Integer getId_producto() {
-        return id_producto;
+    public Integer getIdProducto() {
+        return idProducto;
     }
 
-    public void setId_producto(Integer id_producto) {
-        this.id_producto = id_producto;
+    public void setIdProducto(Integer idProducto) {
+        this.idProducto = idProducto;
     }
 
     public String getCodigo() {
@@ -80,20 +89,20 @@ public class Producto {
         this.descripcion = descripcion;
     }
 
-    public Double getPrecio_compra() {
-        return precio_compra;
+    public Double getPrecioCompra() {
+        return precioCompra;
     }
 
-    public void setPrecio_compra(Double precio_compra) {
-        this.precio_compra = precio_compra;
+    public void setPrecioCompra(Double precioCompra) {
+        this.precioCompra = precioCompra;
     }
 
-    public Double getPrecio_venta() {
-        return precio_venta;
+    public Double getPrecioVenta() {
+        return precioVenta;
     }
 
-    public void setPrecio_venta(Double precio_venta) {
-        this.precio_venta = precio_venta;
+    public void setPrecioVenta(Double precioVenta) {
+        this.precioVenta = precioVenta;
     }
 
     public Categoria getCategoria() {
@@ -120,19 +129,27 @@ public class Producto {
         this.estado = estado;
     }
 
-    public LocalDateTime getCreated_at() {
-        return created_at;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated_at(LocalDateTime created_at) {
-        this.created_at = created_at;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdated_at() {
-        return updated_at;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdated_at(LocalDateTime updated_at) {
-        this.updated_at = updated_at;
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public List<AlmacenProducto> getAlmacenProductos() {
+        return almacenProductos;
+    }
+
+    public void setAlmacenProductos(List<AlmacenProducto> almacenProductos) {
+        this.almacenProductos = almacenProductos;
     }
 }

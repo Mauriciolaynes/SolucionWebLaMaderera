@@ -55,7 +55,7 @@ public class ProductoController {
         if (result.hasErrors()) {
             model.addAttribute("categorias", categoriaRepo.findAll());
             model.addAttribute("proveedores", proveedorRepo.findAll());
-            return "producto/producto-registrar";
+            return "producto/producto-form"; // ¡CORRECCIÓN! El nombre correcto de la vista.
         }
 
         // Cargar la categoría completa desde DB
@@ -64,12 +64,20 @@ public class ProductoController {
                                              .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
             producto.setCategoria(categoriaReal);
         }
+        
+        // --- ¡ESTA ES LA CORRECCIÓN CLAVE! ---
+        // Cargar el proveedor completo desde la DB y asignarlo al producto.
+        if (producto.getProveedor() != null && producto.getProveedor().getIdProveedor() != null) {
+            var proveedorReal = proveedorRepo.findById(producto.getProveedor().getIdProveedor())
+                                             .orElseThrow(() -> new IllegalArgumentException("Proveedor no encontrado"));
+            producto.setProveedor(proveedorReal);
+        }
 
         // Si el producto es nuevo
-        if (producto.getId_producto() == null) {
+        if (producto.getIdProducto() == null) {
             asignarCodigo(producto);
         } else {
-            Producto productoExistente = productoRepo.findById(producto.getId_producto()).orElse(null);
+            Producto productoExistente = productoRepo.findById(producto.getIdProducto()).orElse(null);
             if (productoExistente != null) {
                 if (!productoExistente.getCategoria().getIdCategoria()
                         .equals(producto.getCategoria().getIdCategoria())) {
@@ -102,7 +110,7 @@ public class ProductoController {
         }
 
         // Buscar el último producto creado en esa categoría
-        Producto ultimoProducto = productoRepo.findTopByCategoriaIdCategoriaOrderByIdDesc(
+        Producto ultimoProducto = productoRepo.findTopByCategoriaIdCategoriaOrderByIdProductoDesc(
                 producto.getCategoria().getIdCategoria());
 
         int siguienteNumero = 1;

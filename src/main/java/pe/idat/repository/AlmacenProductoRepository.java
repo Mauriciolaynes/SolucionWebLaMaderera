@@ -1,16 +1,18 @@
 package pe.idat.repository;
 
+// En la interfaz AlmacenProductoRepository.java
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import pe.idat.entity.AlmacenProducto;
 import pe.idat.entity.AlmacenProductoId;
-import java.util.Optional;
 import java.util.List;
 
 public interface AlmacenProductoRepository extends JpaRepository<AlmacenProducto, AlmacenProductoId> {
-	List<AlmacenProducto> findById_IdAlmacen(Integer idAlmacen); // mejor que findByIdIdAlmacen
-    List<AlmacenProducto> findByProducto_Categoria_IdCategoria(Integer idCategoria);
-    Optional<AlmacenProducto> findById_IdProducto(Integer idProducto);
-    List<AlmacenProducto> findByStockActualLessThan(int stock);
 
+    // Asegúrate de que este método exista y esté escrito exactamente así:
+    List<AlmacenProducto> findByProductoCategoriaIdCategoria(Integer idCategoria);
 
+    // Otros métodos que puedas tener, como el que se usa en AdminController:
+    List<AlmacenProducto> findByStockActualLessThan(int umbral);
 }
+

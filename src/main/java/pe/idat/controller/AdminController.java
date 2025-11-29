@@ -38,6 +38,14 @@ public class AdminController {
     @Autowired
     private AlmacenProductoRepository almacenProductoRepo;
 
+    // --- REDIRECCIÓN PARA ENLACE INCORRECTO ---
+    // Esto captura la petición a "/dashboard" y la redirige a la URL correcta.
+    @GetMapping("/dashboard")
+    public String redireccionarADashboard() {
+        return "redirect:/admin/admin-dashboard";
+    }
+
+
     // --- DASHBOARD ADMIN ---
     @GetMapping("/admin/admin-dashboard")
     public String mostrarDashboard(Model model) {

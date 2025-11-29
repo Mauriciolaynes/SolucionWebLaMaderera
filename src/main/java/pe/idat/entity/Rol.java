@@ -2,6 +2,7 @@ package pe.idat.entity;
 
 import jakarta.persistence.*;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "rol")
@@ -16,6 +17,7 @@ public class Rol {
     private Integer estado;
 
     @OneToMany(mappedBy = "rol")
+    @JsonIgnore // ¡SOLUCIÓN ADICIONAL! Rompe el bucle con Usuario.
     private List<Usuario> usuarios;
 
     // Getters y Setters

@@ -37,20 +37,20 @@
             </tr>
         </thead>
         <tbody>
-            <c:forEach var="p" items="${productos}">
+            <c:forEach items="${productos}" var="producto">
                 <tr>
-                    <td><c:out value="${p.id_producto}"/></td>
-                    <td><c:out value="${p.codigo}"/></td>
-                    <td><c:out value="${p.nombre}"/></td>
-                    <td><c:out value="${p.categoria.nombre}"/></td>
-                    <td><c:out value="${p.proveedor.nombre}"/></td>
-                    <td><c:out value="${p.precio_compra}"/></td>
-                    <td><c:out value="${p.precio_venta}"/></td>
+                    <td><c:out value="${producto.idProducto}"/></td>
+                    <td><c:out value="${producto.codigo}"/></td>
+                    <td><c:out value="${producto.nombre}"/></td>
+                    <td><c:out value="${producto.categoria.nombre}"/></td>
+                    <td><c:out value="${producto.proveedor.nombre}"/></td>
+                    <td><c:out value="${producto.precioCompra}"/></td>
+                    <td><c:out value="${producto.precioVenta}"/></td>
                     <td>
-                        <a href="${pageContext.request.contextPath}/productos/editar/${p.id_producto}" class="btn-editar">Editar</a>
-                        <a href="${pageContext.request.contextPath}/productos/eliminar/${p.id_producto}"
+                        <a href="${pageContext.request.contextPath}/productos/editar/${producto.idProducto}" class="btn-editar">Editar</a>
+                        <a href="${pageContext.request.contextPath}/productos/eliminar/${producto.idProducto}"
                            class="btn-eliminar"
-                           onclick="return confirm('¿Desea eliminar el producto: ${p.nombre}?');">Eliminar</a>
+                           onclick="return confirm('¿Desea eliminar el producto: ${producto.nombre}?');">Eliminar</a>
                     </td>
                 </tr>
             </c:forEach>

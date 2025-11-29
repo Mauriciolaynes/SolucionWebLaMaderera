@@ -23,7 +23,7 @@ public class InventarioService {
     // Listar inventario por categoría
     public List<AlmacenProducto> listarPorCategoria(Integer idCategoria) {
         if (idCategoria != null) {
-            return almacenProductoRepository.findByProducto_Categoria_IdCategoria(idCategoria);
+            return almacenProductoRepository.findByProductoCategoriaIdCategoria(idCategoria);
         } else {
             return listarTodos();
         }
