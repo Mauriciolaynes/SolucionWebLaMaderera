@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "proveedor")
@@ -37,6 +38,7 @@ public class Proveedor {
 	    private Boolean estado = true;
 
 	    @OneToMany(mappedBy = "proveedor")
+	    @JsonIgnore
 	    private List<PedidoCompra> pedidosCompra;
 
 	    // Getters y Setters

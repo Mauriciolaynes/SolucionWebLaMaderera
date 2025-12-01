@@ -20,11 +20,6 @@
             <i class="fas fa-plus"></i> Nuevo Proveedor
         </a>
         
-        <!-- ===== BOTÓN AÑADIDO ===== -->
-        <a href="${pageContext.request.contextPath}/pedidos-compra/nuevo" class="btn-agregar" style="background-color: #27ae60;">
-            <i class="fas fa-shopping-cart"></i> Nuevo Pedido de Compra
-        </a>
-
         <a href="${pageContext.request.contextPath}/admin/admin-dashboard" class="btn-agregar" style="background-color: #7f8c8d;">
             <i class="fas fa-arrow-left"></i> Volver
         </a>

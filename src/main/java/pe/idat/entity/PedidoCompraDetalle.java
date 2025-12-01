@@ -1,5 +1,6 @@
 package pe.idat.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
@@ -17,15 +18,16 @@ public class PedidoCompraDetalle {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idPedidoDetalle;
-
+    
     private Integer cantidad;
     private Double precioCompra; // Usar camelCase
 
     // --- RELACIÓN CON PedidoCompra ---
     @ManyToOne
     @JoinColumn(name = "id_pedido_compra")
-    @JsonIgnore // Evita problemas de serialización infinita
+    @JsonBackReference
     private PedidoCompra pedidoCompra;
+
 
     // --- RELACIÓN CON Producto ---
     @ManyToOne

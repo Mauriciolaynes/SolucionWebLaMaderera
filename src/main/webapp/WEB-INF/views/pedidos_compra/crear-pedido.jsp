@@ -78,6 +78,7 @@
 
         <div class="mt-4 text-end">
             <button type="button" class="btn btn-primary" onclick="enviarSeguro()">Ver Resumen del Pedido</button>
+            <a href="${pageContext.request.contextPath}/compras" class="btn btn-secondary">Volver</a>
         </div>
     </form>
 </div>

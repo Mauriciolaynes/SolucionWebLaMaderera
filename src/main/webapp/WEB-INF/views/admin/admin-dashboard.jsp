@@ -20,6 +20,7 @@
                 <li class="active"><a href="${pageContext.request.contextPath}/dashboard"><i class="fas fa-home"></i> Inicio</a></li>
                 <li><a href="${pageContext.request.contextPath}/productos/listar"><i class="fas fa-boxes"></i> Productos</a></li>
                 <li><a href="${pageContext.request.contextPath}/proveedores/listar"><i class="fas fa-truck"></i> Proveedores</a></li>
+                <li><a href="${pageContext.request.contextPath}/compras"><i class="fas fa-boxes"></i> Compras</a></li>
                 <li><a href="${pageContext.request.contextPath}/inventario/listar"><i class="fas fa-warehouse"></i> Inventario</a></li>
                 <li><a href="${pageContext.request.contextPath}/admin/listar-empleados"><i class="fas fa-users"></i> Usuarios</a></li>
             </ul>

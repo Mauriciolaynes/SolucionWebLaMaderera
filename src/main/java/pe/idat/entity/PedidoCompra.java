@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,25 +29,22 @@ public class PedidoCompra {
     private LocalDate fechaPedido;
     private Double total;
     
-    // --- ¡CAMBIO! Se añade el campo 'estado' ---
     private String estado;
 
     @ManyToOne
     @JoinColumn(name = "id_proveedor")
     private Proveedor proveedor;
 
+    // --- CORRECCIÓN CRÍTICA AQUI ---
     @OneToMany(mappedBy = "pedidoCompra", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PedidoCompraDetalle> detalles = new ArrayList<>();
+    @JsonManagedReference
+    private List<PedidoCompraDetalle> detalles = new ArrayList<>(); // Inicializado para seguridad
 
     @PrePersist
-        protected void onCreate() {
-            this.fechaPedido = LocalDate.now();
-            
-            // --- NUEVO: Asignar estado por defecto si no tiene uno ---
-            if (this.estado == null || this.estado.isEmpty()) {
-                this.estado = "GENERADO"; // O "PENDIENTE", según tu lógica de negocio
-            }
-        }
+    protected void onCreate() {
+        this.fechaPedido = LocalDate.now();
+        // La lógica del estado se moverá al setter para que funcione en creación y actualización.
+    }
 
     // --- GETTERS Y SETTERS ---
 
@@ -94,15 +93,34 @@ public class PedidoCompra {
     }
 
     public void setDetalles(List<PedidoCompraDetalle> detalles) {
+        // Truco pro: Si reasignas la lista completa, asegúrate de mantener la relación bidireccional
         this.detalles = detalles;
+        if(detalles != null) {
+            for(PedidoCompraDetalle d : detalles) {
+                d.setPedidoCompra(this);
+            }
+        }
     }
     
-    // --- ¡CAMBIO! Getters y Setters para el nuevo campo 'estado' ---
     public String getEstado() {
         return estado;
     }
 
     public void setEstado(String estado) {
-        this.estado = estado;
+        // --- LÓGICA CENTRALIZADA ---
+        // Si el estado que llega es nulo o vacío, le asignamos "PENDIENTE" por defecto.
+        // Si llega un estado válido ("Aprobado", "Rechazado", etc.), se asigna ese valor.
+        if (estado == null || estado.trim().isEmpty()) {
+            this.estado = "PENDIENTE";
+        } else {
+            this.estado = estado;
+        }
+    }
+    
+    // --- MÉTODO AYUDA (Opcional pero muy recomendado) ---
+    // Úsalo para agregar detalles desde Java y mantener la coherencia
+    public void agregarDetalle(PedidoCompraDetalle detalle) {
+        detalles.add(detalle);
+        detalle.setPedidoCompra(this);
     }
 }

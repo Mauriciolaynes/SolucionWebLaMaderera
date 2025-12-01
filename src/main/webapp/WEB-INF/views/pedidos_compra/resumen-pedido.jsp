@@ -69,7 +69,21 @@
     </div>
 
     <form action="${pageContext.request.contextPath}/pedidos-compra/guardar" method="post" class="mt-4 text-end">
-        <a href="${pageContext.request.contextPath}/pedidos-compra/nuevo" class="btn btn-secondary">Cancelar y Volver</a>
+        <%-- 
+            Lógica condicional para el botón de "Volver" o "Editar".
+            - Si el pedido tiene un ID, es una EDICIÓN. El botón debe llevar de vuelta al formulario de edición.
+            - Si el pedido NO tiene ID, es uno NUEVO. El botón debe llevar al formulario de nuevo pedido.
+        --%>
+        <c:choose>
+            <c:when test="${not empty pedidoEnProceso.idPedidoCompra}">
+                <%-- Es una edición, volvemos a la página de editar con el ID --%>
+                <a href="${pageContext.request.contextPath}/pedidos-compra/editar/${pedidoEnProceso.idPedidoCompra}" class="btn btn-secondary">Volver y Editar</a>
+            </c:when>
+            <c:otherwise>
+                <%-- Es un pedido nuevo, volvemos a la página de nuevo --%>
+                <a href="${pageContext.request.contextPath}/pedidos-compra/nuevo" class="btn btn-secondary">Cancelar y Volver</a>
+            </c:otherwise>
+        </c:choose>
         <button type="submit" class="btn btn-success">Confirmar y Guardar Pedido</button>
     </form>
 </div>
