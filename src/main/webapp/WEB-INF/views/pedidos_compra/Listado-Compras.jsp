@@ -144,16 +144,16 @@
 
         <c:forEach var="oc" items="${ordenes}">
             <tr>
-                <td>${oc.idOrdenCompra}</td>
+                <td>${oc.idOrden}</td>
                 <td>${oc.proveedor.nombre}</td>
                 <td>${oc.fecha}</td>
                 <td>${oc.numeroOrden}</td>
                 <td>${oc.estado}</td>
                 <td>
-                    <a href="${pageContext.request.contextPath}/ordenes-compra/ver/${oc.idOrdenCompra}" class="btn-editar">Ver</a>
-                    <a href="${pageContext.request.contextPath}/ordenes-compra/editar/${oc.idOrdenCompra}" class="btn-editar">Editar</a>
-                    <a href="${page-context.request.contextPath}/ordenes-compra/eliminar/${oc.idOrdenCompra}" class="btn-editar" style="background-color:#c0392b;">Eliminar</a>
-                    <a href="${pageContext.request.contextPath}/ordenes-compra/pdf/${oc.idOrdenCompra}" class="btn-editar" style="background-color: #f39c12;">PDF</a>
+                    <a href="${pageContext.request.contextPath}/ordenes-compra/ver/${oc.idOrden}" class="btn-editar">Ver</a>
+                    <a href="${pageContext.request.contextPath}/ordenes-compra/editar/${oc.idOrden}" class="btn-editar">Editar</a>
+                    <a href="${pageContext.request.contextPath}/ordenes-compra/eliminar/${oc.idOrden}" class="btn-editar" style="background-color:#c0392b;">Eliminar</a>
+                    <a href="${pageContext.request.contextPath}/ordenes-compra/pdf/${oc.idOrden}" class="btn-editar" style="background-color: #f39c12;">PDF</a>
                 </td>
             </tr>
         </c:forEach>
@@ -188,15 +188,16 @@
 
         <c:forEach var="fac" items="${facturas}">
             <tr>
-                <td>${fac.idFacturaCompra}</td>
+                <td>${fac.idFactura}</td>
                 <td>${fac.numeroFactura}</td>
                 <td>${fac.proveedor.nombre}</td>
                 <td>${fac.fecha}</td>
                 <td>S/ ${fac.monto}</td>
                 <td>${fac.estadoPago}</td>
                 <td>
-                    <a href="${pageContext.request.contextPath}/facturas-compra/ver/${fac.idFacturaCompra}" class="btn-editar">Ver</a>
-                </td>
+                    <a href="${pageContext.request.contextPath}/facturas-compra/ver/${fac.idFactura}" class="btn-editar">Ver</a>
+                    
+                    </td>
             </tr>
         </c:forEach>
 

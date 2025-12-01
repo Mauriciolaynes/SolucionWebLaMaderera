@@ -10,13 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        .container {
-            max-width: 800px; /* Ancho controlado para que no se estire demasiado */
-        }
-        .card-header {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
+        .container { max-width: 800px; }
+        .card-header { background-color: #f8f9fa; font-weight: 600; }
     </style>
 </head>
 <body class="bg-light">
@@ -56,8 +51,9 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">N° de Factura:</label>
-                        <input type="text" name="numeroFactura" class="form-control" 
-                               value="${factura.numeroFactura}" placeholder="Ej: F001-000234" required/>
+                        <input type="text" name="numeroFactura" class="form-control bg-light" 
+                               value="${factura.numeroFactura}" 
+                               placeholder="Autogenerado" required readonly/>
                     </div>
                     
                     <div class="col-md-6 mb-3">
@@ -87,7 +83,9 @@
                     </div>
                 </div>
 
-            </div> <div class="card-footer text-end py-3">
+            </div> 
+            
+            <div class="card-footer text-end py-3">
                 <a href="${pageContext.request.contextPath}/compras" class="btn btn-secondary me-2">
                     <i class="fas fa-times me-1"></i> Cancelar
                 </a>

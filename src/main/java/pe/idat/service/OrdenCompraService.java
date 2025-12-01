@@ -10,10 +10,12 @@ import pe.idat.entity.CotizacionEstado;
 import pe.idat.repository.OrdenCompraRepository;
 import pe.idat.repository.CotizacionRepository;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class OrdenCompraService {
+    
     @Autowired
     private OrdenCompraRepository ordenCompraRepository;
 
@@ -41,12 +43,15 @@ public class OrdenCompraService {
         orden.setProveedor(cotizacion.getProveedor());
         orden.setFecha(LocalDate.now());
         
-        // Asumiendo que el estado en OrdenCompra es String (según tu código anterior)
+        // Estado inicial
         orden.setEstado("GENERADA"); 
         
         orden.setCotizacionOrigen(cotizacion);
-        orden.setNumeroOrden(generarSiguienteNumero());
+        // Generamos el número automáticamente
+        orden.setNumeroOrden(generarSiguienteNumeroOrden());
 
+        orden.setDetalles(new ArrayList<>());
+        
         // Mapeo de detalles
         if (cotizacion.getDetalles() != null) {
             for (var det : cotizacion.getDetalles()) {
@@ -68,19 +73,26 @@ public class OrdenCompraService {
 
     /**
      * Guarda o actualiza una orden de compra.
-     * Si la orden es nueva (sin ID), le asigna fecha, estado y número.
-     * Si ya existe, simplemente guarda los cambios.
      */
     @Transactional
     public OrdenCompra guardar(OrdenCompra orden) {
-        // Si es una orden nueva, asignamos valores por defecto.
+        // Si es una orden nueva (ID nulo)
         if (orden.getIdOrden() == null) {
-            orden.setFecha(LocalDate.now());
-            orden.setEstado("GENERADA"); // Estado inicial para órdenes creadas manualmente
-            orden.setNumeroOrden(generarSiguienteNumero());
+            
+            if (orden.getFecha() == null) {
+                orden.setFecha(LocalDate.now());
+            }
+            if (orden.getEstado() == null) {
+                orden.setEstado("GENERADA");
+            }
+            
+            // Si no viene con número (por si acaso), lo generamos
+            if (orden.getNumeroOrden() == null || orden.getNumeroOrden().isEmpty()) {
+                orden.setNumeroOrden(generarSiguienteNumeroOrden());
+            }
         }
 
-        // Es buena práctica asegurar la relación bidireccional antes de guardar.
+        // Asegurar relación bidireccional
         if (orden.getDetalles() != null) {
             orden.getDetalles().forEach(detalle -> detalle.setOrdenCompra(orden));
         }
@@ -93,19 +105,37 @@ public class OrdenCompraService {
         ordenCompraRepository.deleteById(id);
     }
 
-    private String generarSiguienteNumero() {
-        // CORREGIDO: Llamada al método actualizado del repositorio
-        OrdenCompra ultimo = ordenCompraRepository.findTopByOrderByIdOrdenDesc();
+    /**
+     * Genera el correlativo con formato OC-YYYY-XX
+     * Ejemplo: OC-2025-01, OC-2025-02...
+     * Es PUBLIC para poder llamarlo desde el Controlador al abrir el formulario.
+     */
+    public String generarSiguienteNumeroOrden() {
+        // 1. Obtener año actual
+        int anioActual = LocalDate.now().getYear();
         
-        int siguiente = 1;
-        if (ultimo != null && ultimo.getNumeroOrden() != null) {
-            try {
-                String numStr = ultimo.getNumeroOrden().replaceAll("\\D+", "");
-                siguiente = Integer.parseInt(numStr) + 1;
-            } catch (Exception e) {
-                siguiente = 1;
+        // 2. Buscar la última orden registrada
+        OrdenCompra ultimaOrden = ordenCompraRepository.findTopByOrderByIdOrdenDesc();
+        
+        int siguienteNumero = 1;
+        
+        if (ultimaOrden != null && ultimaOrden.getNumeroOrden() != null) {
+            String ultimoCodigo = ultimaOrden.getNumeroOrden();
+            // Esperamos formato: OC-2025-01 (separado por guiones)
+            String[] partes = ultimoCodigo.split("-");
+            
+            // Validamos que tenga 3 partes y que el año coincida
+            if (partes.length == 3 && partes[1].equals(String.valueOf(anioActual))) {
+                try {
+                    int correlativoActual = Integer.parseInt(partes[2]);
+                    siguienteNumero = correlativoActual + 1;
+                } catch (NumberFormatException e) {
+                    siguienteNumero = 1;
+                }
             }
         }
-        return "OC-" + String.format("%04d", siguiente);
+        
+        // 3. Formatear: OC-2025-05 (con ceros a la izquierda si es necesario)
+        return String.format("OC-%d-%02d", anioActual, siguienteNumero);
     }
 }

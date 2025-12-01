@@ -8,16 +8,6 @@
     <title>Orden de Compra</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <style>
-        .container {
-            max-width: 900px;
-        }
-        .card-header {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
-    </style>
 </head>
 <body class="bg-light">
 
@@ -59,8 +49,10 @@
                         <label class="form-label fw-bold">Número de Orden:</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
-                            <input type="text" name="numeroOrden" class="form-control" 
-                                   value="${orden.numeroOrden}" placeholder="Ej: OC-2025-001" required/>
+                            <input type="text" name="numeroOrden" class="form-control bg-light" 
+                                   value="${orden.numeroOrden}" 
+                                   placeholder="Autogenerado" 
+                                   readonly required/> 
                         </div>
                     </div>
 
@@ -81,8 +73,10 @@
                     </div>
                 </div>
 
-            </div> <div class="card-footer text-end py-3">
-                <a href="${pageContext.request.contextPath}/compras" class="btn btn-secondary me-2">
+            </div> 
+            
+            <div class="card-footer text-end py-3">
+                <a href="${pageContext.request.contextPath}/ordenes-compra/listado" class="btn btn-secondary me-2">
                     <i class="fas fa-times me-1"></i> Cancelar
                 </a>
                 <button type="submit" class="btn btn-primary">

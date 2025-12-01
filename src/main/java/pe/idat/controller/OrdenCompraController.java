@@ -1,22 +1,21 @@
 package pe.idat.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import pe.idat.entity.OrdenCompra;
 import pe.idat.entity.Proveedor;
 import pe.idat.service.OrdenCompraService;
 import pe.idat.service.ProveedorService;
+import pe.idat.service.PedidoCompraService;
+import pe.idat.service.CotizacionService;
+import pe.idat.service.FacturaCompraService;
 
 @Controller
 @RequestMapping("/ordenes-compra")
@@ -28,29 +27,62 @@ public class OrdenCompraController {
     @Autowired
     private ProveedorService proveedorService;
 
-    // 1. Mostrar formulario para NUEVA Orden
+    // Servicios adicionales para mantener las tablas llenas
+    @Autowired private PedidoCompraService pedidoService;
+    @Autowired private CotizacionService cotizacionService;
+    @Autowired private FacturaCompraService facturaService;
+
+
+    // ==========================================
+    // 1. LISTAR TODO
+    // ==========================================
+    @GetMapping("/listado")
+    public String listarOrdenes(Model model) {
+        model.addAttribute("ordenes", ordenService.listarOrdenes());
+        
+        // Cargar las otras tablas para que la vista no se quede vacía
+        model.addAttribute("pedidos", pedidoService.listarTodos()); 
+        model.addAttribute("cotizaciones", cotizacionService.listarCotizaciones());
+        model.addAttribute("facturas", facturaService.listarFacturas());
+
+        return "pedidos_compra/Listado-Compras";
+    }
+
+
+    // ==========================================
+    // 2. NUEVA ORDEN (Con Autogeneración de Número)
+    // ==========================================
     @GetMapping("/nuevo")
     public String nuevaOrden(Model model) {
         OrdenCompra orden = new OrdenCompra();
         
-        // Cargar proveedores para el <select>
-        List<Proveedor> listaProveedores = proveedorService.listarProveedores();
+        // A. Generar número automático (OC-2025-XX)
+        String nuevoNumero = ordenService.generarSiguienteNumeroOrden();
+        orden.setNumeroOrden(nuevoNumero);
         
-        // "orden" debe coincidir con ${orden} en el JSP
+        // B. Establecer fecha actual por defecto
+        orden.setFecha(LocalDate.now());
+        
+        // C. Cargar proveedores
+        List<Proveedor> listaProveedores = proveedorService.listarProveedores();
+
         model.addAttribute("orden", orden);
         model.addAttribute("proveedores", listaProveedores);
-        
-        return "pedidos_compra/ordencompra-form"; // Nombre de tu archivo JSP
+
+        return "pedidos_compra/ordencompra-form";
     }
 
-    // 2. Mostrar formulario para EDITAR Orden existente
+
+    // ==========================================
+    // 3. EDITAR ORDEN
+    // ==========================================
     @GetMapping("/editar/{id}")
     public String editarOrden(@PathVariable Integer id, Model model, RedirectAttributes redirect) {
         OrdenCompra orden = ordenService.obtenerPorId(id);
 
         if (orden == null) {
-            redirect.addFlashAttribute("error", "La orden de compra no fue encontrada.");
-            return "redirect:/compras";
+            redirect.addFlashAttribute("error", "La orden de compra no existe.");
+            return "redirect:/ordenes-compra/listado";
         }
 
         List<Proveedor> listaProveedores = proveedorService.listarProveedores();
@@ -58,54 +90,59 @@ public class OrdenCompraController {
         model.addAttribute("orden", orden);
         model.addAttribute("proveedores", listaProveedores);
 
-        return "pedidos_compra/ordencompra-form"; // Reutilizamos el mismo formulario de creación
+        return "pedidos_compra/ordencompra-form";
     }
 
-    // Método para VER el detalle de una orden
+
+    // ==========================================
+    // 4. GUARDAR ORDEN (Con asignación de Proveedor)
+    // ==========================================
+    @PostMapping("/guardar")
+    public String guardarOrden(
+            @ModelAttribute("orden") OrdenCompra orden,
+            @RequestParam("idProveedor") Integer idProveedor, // Captura el ID del select
+            RedirectAttributes redirect) {
+        
+        try {
+            // 1. Buscar el proveedor real en la BD
+            Proveedor proveedorEncontrado = proveedorService.obtenerPorId(idProveedor);
+            
+            // 2. Asignarlo a la orden
+            orden.setProveedor(proveedorEncontrado);
+
+            // 3. Guardar
+            ordenService.guardar(orden);
+            
+            redirect.addFlashAttribute("success", "Orden guardada correctamente.");
+            
+        } catch (Exception e) {
+            redirect.addFlashAttribute("error", "Error al guardar: " + e.getMessage());
+        }
+
+        return "redirect:/ordenes-compra/listado";
+    }
+
+
+    // ==========================================
+    // 5. ELIMINAR ORDEN
+    // ==========================================
+    @GetMapping("/eliminar/{id}")
+    public String eliminarOrden(@PathVariable Integer id, RedirectAttributes redirect) {
+        try {
+            ordenService.eliminar(id);
+            redirect.addFlashAttribute("success", "Orden eliminada correctamente.");
+        } catch (Exception e) {
+            redirect.addFlashAttribute("error", "No se pudo eliminar la orden.");
+        }
+        return "redirect:/ordenes-compra/listado";
+    }
+    
+    // (Opcional) Método ver detalle si lo usas
     @GetMapping("/ver/{id}")
     public String verOrden(@PathVariable Integer id, Model model, RedirectAttributes redirect) {
         OrdenCompra orden = ordenService.obtenerPorId(id);
-
-        if (orden == null) {
-            redirect.addFlashAttribute("error", "La orden de compra no fue encontrada.");
-            return "redirect:/compras";
-        }
-
+        if (orden == null) return "redirect:/ordenes-compra/listado";
         model.addAttribute("orden", orden);
-        return "pedidos_compra/ver-orden"; // Necesitarás crear esta vista JSP
-    }
-
-    // PASO 1: Mostrar página de confirmación para ELIMINAR una orden
-    @GetMapping("/eliminar/{id}")
-    public String mostrarConfirmacionEliminar(@PathVariable Integer id, Model model, RedirectAttributes redirect) {
-        OrdenCompra orden = ordenService.obtenerPorId(id);
-        if (orden == null) {
-            redirect.addFlashAttribute("error", "La orden de compra que intenta eliminar no existe.");
-            return "redirect:/compras";
-        }
-
-        model.addAttribute("orden", orden);
-        return "ordenes_compra/eliminar-resumen"; // Nueva vista de confirmación
-    }
-
-    // PASO 2: Procesar la eliminación después de la confirmación
-    @PostMapping("/eliminar-confirmado")
-    public String eliminarOrdenConfirmado(@RequestParam("idOrden") Integer id, RedirectAttributes redirect) {
-        try {
-            ordenService.eliminar(id);
-            redirect.addFlashAttribute("success", "Orden de compra eliminada correctamente.");
-        } catch (Exception e) {
-            redirect.addFlashAttribute("error", "No se pudo eliminar la orden. Es posible que tenga facturas asociadas.");
-            System.err.println("Error al eliminar orden: " + e.getMessage());
-        }
-        return "redirect:/compras";
-    }
-
-    // 3. Procesar el GUARDADO (Insertar o Actualizar)
-    @PostMapping("/guardar")
-    public String guardarOrden(@ModelAttribute OrdenCompra orden, RedirectAttributes redirect) {
-        ordenService.guardar(orden); // Asumiendo que el servicio tiene un método 'guardar' que crea o actualiza
-        redirect.addFlashAttribute("success", "Orden de compra guardada con éxito.");
-        return "redirect:/compras";
+        return "pedidos_compra/ver-orden";
     }
 }

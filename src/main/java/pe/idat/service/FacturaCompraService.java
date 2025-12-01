@@ -4,43 +4,71 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pe.idat.entity.FacturaCompra;
-import pe.idat.entity.OrdenCompra;
 import pe.idat.repository.FacturaCompraRepository;
-import pe.idat.repository.OrdenCompraRepository;
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class FacturaCompraService {
 
-	@Autowired
-    private FacturaCompraRepository facturaCompraRepository;
-
     @Autowired
-    private OrdenCompraRepository ordenCompraRepository;
+    private FacturaCompraRepository facturaRepository;
 
     @Transactional(readOnly = true)
     public List<FacturaCompra> listarFacturas() {
-        return facturaCompraRepository.findAll();
+        return facturaRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public FacturaCompra obtenerPorId(Integer id) {
+        return facturaRepository.findById(id).orElse(null);
     }
 
     @Transactional
-    public FacturaCompra registrarFactura(FacturaCompra factura) {
-        if (factura.getFecha() == null) factura.setFecha(LocalDate.now());
-        if (factura.getEstadoPago() == null) factura.setEstadoPago("PENDIENTE");
-        // Validar asociación a orden
-        if (factura.getOrdenCompra() != null) {
-            OrdenCompra oc = ordenCompraRepository.findById(factura.getOrdenCompra().getIdOrden()).orElse(null);
-            if (oc == null) throw new IllegalStateException("Orden de compra no encontrada.");
+    public FacturaCompra guardar(FacturaCompra factura) {
+        // Si es nueva
+        if (factura.getIdFactura() == null) {
+            // Fecha actual por defecto si viene nula
+            if (factura.getFecha() == null) {
+                factura.setFecha(LocalDate.now());
+            }
+            // Generar número si no existe
+            if (factura.getNumeroFactura() == null || factura.getNumeroFactura().isEmpty()) {
+                factura.setNumeroFactura(generarSiguienteNumero());
+            }
         }
-        // numero de factura: no correlativo global aquí; se espera que lo proveas o lo generes
-        factura.setNumeroFactura(generarSiguienteNumero());
-        return facturaCompraRepository.save(factura);
+        return facturaRepository.save(factura);
     }
 
-    private String generarSiguienteNumero() {
-        // Simple: usar timestamp o contenedor secuencial (se puede mejorar)
-        long ts = System.currentTimeMillis() % 100000; // ejemplo sencillo
-        return "F-" + String.format("%06d", ts);
+    @Transactional
+    public void eliminar(Integer id) {
+        facturaRepository.deleteById(id);
+    }
+
+    // Lógica de Autoincremento: FAC-2025-001
+    public String generarSiguienteNumero() {
+        int anioActual = LocalDate.now().getYear();
+        
+        // Busca la última factura registrada (Asegúrate de tener este método en el Repo)
+        FacturaCompra ultima = facturaRepository.findTopByOrderByIdFacturaDesc();
+        
+        int siguiente = 1;
+        
+        if (ultima != null && ultima.getNumeroFactura() != null) {
+            String codigo = ultima.getNumeroFactura(); // Ej: FAC-2025-005
+            String[] partes = codigo.split("-");
+            
+            // Validamos formato y año
+            if (partes.length == 3 && partes[1].equals(String.valueOf(anioActual))) {
+                try {
+                    siguiente = Integer.parseInt(partes[2]) + 1;
+                } catch (NumberFormatException e) {
+                    siguiente = 1;
+                }
+            }
+        }
+        
+        // Formato: FAC-2025-001
+        return String.format("FAC-%d-%03d", anioActual, siguiente);
     }
 }
