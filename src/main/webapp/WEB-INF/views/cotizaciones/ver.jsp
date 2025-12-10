@@ -1,147 +1,151 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Detalle de Cotización</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <style>
+        .container { max-width: 900px; }
+        .card-header { background-color: #2980b9; color: white; } /* Azul para Cotizaciones */
+    </style>
 </head>
 <body class="bg-light">
 
-    <div class="container mt-5 mb-5">
-        <div class="card shadow-sm">
-            <div class="card-header bg-info text-dark">
-                <h3 class="mb-0">
+    <div class="container mt-5">
+        <div class="card shadow">
+            
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
                     <i class="fas fa-calculator me-2"></i>
-                    Detalle de Cotización #${cotizacion.idCotizacion}
-                </h3>
+                    Cotización: <strong>${cotizacion.numeroCotizacion}</strong>
+                </h4>
+                
+                <c:choose>
+                    <c:when test="${cotizacion.estado.toString() == 'APROBADA'}">
+                        <span class="badge bg-success fs-6">APROBADA</span>
+                    </c:when>
+                    <c:when test="${cotizacion.estado.toString() == 'RECHAZADA'}">
+                        <span class="badge bg-danger fs-6">RECHAZADA</span>
+                    </c:when>
+                    <c:when test="${cotizacion.estado.toString() == 'ORDEN_GENERADA'}">
+                        <span class="badge bg-info text-dark fs-6">ORDEN GENERADA</span>
+                    </c:when>
+                    <c:otherwise>
+                        <span class="badge bg-warning text-dark fs-6">${cotizacion.estado}</span>
+                    </c:otherwise>
+                </c:choose>
             </div>
+
             <div class="card-body">
                 
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <h5><strong>Proveedor:</strong></h5>
-                        <p>${cotizacion.proveedor.nombre}</p>
-                    </div>
-                    <div class="col-md-4">
-                        <h5><strong>Fecha:</strong></h5>
-                        <p>${cotizacion.fecha}</p>
-                    </div>
-                    <div class="col-md-4">
-                        <h5><strong>Estado:</strong></h5>
-                        <span class="badge bg-primary fs-6">${cotizacion.estado}</span>
-                    </div>
-                </div>
-
-                <div class="row mb-4">
+                <div class="row mb-4 p-3 bg-white rounded border">
                     <div class="col-md-6">
-                        <h5><strong>Pedido de Compra Asociado:</strong></h5>
-                        <p>
-                            <c:choose>
-                                <c:when test="${cotizacion.pedido != null}">
-                                    <a href="${pageContext.request.contextPath}/pedidos-compra/ver/${cotizacion.pedido.idPedidoCompra}" class="text-decoration-none">
-                                        <i class="fas fa-link"></i> Ver Pedido #${cotizacion.pedido.numeroPedido}
-                                    </a>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="text-muted">Sin pedido asociado</span>
-                                </c:otherwise>
-                            </c:choose>
+                        <h6 class="text-muted text-uppercase fw-bold">Proveedor</h6>
+                        <p class="fs-5 mb-0 text-primary">
+                            <i class="fas fa-building me-2"></i>
+                            ${cotizacion.proveedor != null ? cotizacion.proveedor.nombre : 'Sin Proveedor'}
                         </p>
                     </div>
-                    
-                    <c:if test="${not empty cotizacion.archivoAdjunto}">
-                        <div class="col-md-6">
-                            <h5><strong>Archivo Adjunto:</strong></h5>
-                            <p>
-                                <a href="<c:url value='/uploads/cotizaciones/${cotizacion.archivoAdjunto}'/>" target="_blank" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-file-pdf me-1"></i> ${cotizacion.archivoAdjunto}
-                                </a>
-                            </p>
-                        </div>
-                    </c:if>
-                </div>
-
-                <h5 class="mt-4 border-bottom pb-2">Productos Cotizados</h5>
-                
-                <table class="table table-bordered table-hover mt-3">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Producto</th>
-                            <th class="text-end">Cantidad</th>
-                            <th class="text-end">Precio Unitario</th>
-                            <th class="text-end">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:set var="totalCotizacion" value="0" />
-                    <c:forEach var="detalle" items="${cotizacion.detalles}">
-                        <tr>
-                            <td>${detalle.producto.nombre}</td>
-                            <td class="text-end">${detalle.cantidad}</td>
-                            <td class="text-end">
-                                <fmt:formatNumber value="${detalle.precioUnitario}" type="currency" currencySymbol="S/ " />
-                            </td>
-                            <td class="text-end">
-                                <fmt:formatNumber value="${detalle.cantidad * detalle.precioUnitario}" type="currency" currencySymbol="S/ " />
-                            </td>
-                        </tr>
-                        <c:set var="totalCotizacion" value="${totalCotizacion + (detalle.cantidad * detalle.precioUnitario)}" />
-                    </c:forEach>
-                    </tbody>
-                    <tfoot>
-                        <tr class="fw-bold table-active">
-                            <td colspan="3" class="text-end">Total General:</td>
-                            <td class="text-end fs-5">
-                                <fmt:formatNumber value="${totalCotizacion}" type="currency" currencySymbol="S/ " />
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-
-                <div class="mt-4 d-flex justify-content-between">
-                    <a href="${pageContext.request.contextPath}/compras" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Volver al Listado
-                    </a>
-
-                    <%-- Botones de acción condicionales --%>
-                    <div class="btn-group" role="group">
-                        <c:if test="${cotizacion.estado == 'POR_EVALUAR' || cotizacion.estado == 'EN_EVALUACION'}">
-                            
-                            <a href="${pageContext.request.contextPath}/cotizaciones/editar/${cotizacion.idCotizacion}" class="btn btn-primary">
-                                <i class="fas fa-edit"></i> Editar
-                            </a>
-
-                            <form action="${pageContext.request.contextPath}/cotizaciones/aprobar" method="post" class="d-inline">
-                                <input type="hidden" name="idCotizacion" value="${cotizacion.idCotizacion}">
-                                <button type="submit" class="btn btn-success" style="border-radius: 0;">
-                                    <i class="fas fa-check"></i> Aprobar
-                                </button>
-                            </form>
-
-                            <form action="${pageContext.request.contextPath}/cotizaciones/rechazar" method="post" class="d-inline">
-                                <input type="hidden" name="idCotizacion" value="${cotizacion.idCotizacion}">
-                                <button type="submit" class="btn btn-danger" style="border-radius: 0;">
-                                    <i class="fas fa-times"></i> Rechazar
-                                </button>
-                            </form>
-
-                            <form action="${pageContext.request.contextPath}/cotizaciones/anular" method="post" class="d-inline">
-                                <input type="hidden" name="idCotizacion" value="${cotizacion.idCotizacion}">
-                                <button type="submit" class="btn btn-warning" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
-                                    <i class="fas fa-ban"></i> Anular
-                                </button>
-                            </form>
-                        </c:if>
+                    <div class="col-md-6 text-md-end">
+                        <h6 class="text-muted text-uppercase fw-bold">Fecha de Emisión</h6>
+                        <p class="fs-5 mb-0">
+                            <i class="far fa-calendar-alt me-2"></i>
+                            ${cotizacion.fecha}
+                        </p>
                     </div>
                 </div>
+
+                <h5 class="mb-3 text-secondary border-bottom pb-2">Productos Cotizados</h5>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover align-middle">
+                        <thead class="table-secondary text-center">
+                            <tr>
+                                <th>#</th>
+                                <th class="text-start">Producto</th>
+                                <th>Cantidad</th>
+                                <th class="text-end">Precio Unit.</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:set var="granTotal" value="0" />
+                            
+                            <c:forEach var="det" items="${cotizacion.detalles}" varStatus="status">
+                                <c:set var="subtotal" value="${det.cantidad * det.precioUnitario}" />
+                                <c:set var="granTotal" value="${granTotal + subtotal}" />
+                                
+                                <tr>
+                                    <td class="text-center">${status.count}</td>
+                                    <td><strong>${det.producto.nombre}</strong></td>
+                                    <td class="text-center">${det.cantidad}</td>
+                                    <td class="text-end">
+                                        S/ <fmt:formatNumber value="${det.precioUnitario}" minFractionDigits="2" maxFractionDigits="2"/>
+                                    </td>
+                                    <td class="text-end fw-bold">
+                                        S/ <fmt:formatNumber value="${subtotal}" minFractionDigits="2" maxFractionDigits="2"/>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+
+                            <c:if test="${empty cotizacion.detalles}">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">
+                                        No hay productos registrados en esta cotización.
+                                    </td>
+                                </tr>
+                            </c:if>
+                        </tbody>
+                        <tfoot class="table-dark">
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold fs-5">TOTAL ESTIMADO:</td>
+                                <td class="text-end fw-bold fs-5">
+                                    S/ <fmt:formatNumber value="${granTotal}" minFractionDigits="2" maxFractionDigits="2"/>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
             </div>
+
+            <div class="card-footer bg-white d-flex justify-content-between py-3">
+                
+                <a href="${pageContext.request.contextPath}/compras" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Volver
+                </a>
+                
+                <div class="btn-group">
+                    
+                    <c:if test="${cotizacion.estado.toString() == 'POR_EVALUAR' || cotizacion.estado.toString() == 'EN_EVALUACION'}">
+                        <a href="${pageContext.request.contextPath}/cotizaciones/editar/${cotizacion.idCotizacion}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit me-1"></i> Editar
+                        </a>
+                    </c:if>
+
+                    <c:if test="${cotizacion.estado.toString() == 'APROBADA'}">
+                        <form action="${pageContext.request.contextPath}/compras/cotizaciones/${cotizacion.idCotizacion}/generar-orden" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-success" onclick="return confirm('¿Estás seguro de generar la Orden de Compra?');">
+                                <i class="fas fa-file-contract me-1"></i> Generar Orden
+                            </button>
+                        </form>
+                    </c:if>
+
+                    <button class="btn btn-danger ms-2" onclick="window.print()">
+                        <i class="fas fa-print"></i>
+                    </button>
+                </div>
+            </div>
+
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

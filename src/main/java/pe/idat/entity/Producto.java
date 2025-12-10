@@ -32,6 +32,9 @@ public class Producto {
     @DecimalMin(value = "0.0", message = "Debe ser mayor o igual a 0")
     @Column(name = "precio_venta")
     private Double precioVenta;
+    
+    @Column(name = "imagen")
+    private String imagen;
 
     @ManyToOne
     @JoinColumn(name = "id_categoria")
@@ -150,5 +153,12 @@ public class Producto {
 
     public void setAlmacenProductos(List<AlmacenProducto> almacenProductos) {
         this.almacenProductos = almacenProductos;
+    }
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 }

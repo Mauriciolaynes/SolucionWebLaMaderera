@@ -1,101 +1,127 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Detalle de Orden de Compra</title>
-    <!-- Incluye tus CSS y JS aquí (Bootstrap, etc.) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <style>
+        .container { max-width: 900px; }
+        .card-header { background-color: #343a40; color: white; }
+    </style>
 </head>
-<body>
+<body class="bg-light">
 
-    <%-- Incluir el Navbar --%>
-    <jsp:include page="../common/navbar.jsp" />
-
-    <div class="container mt-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h3 class="mb-0">
+    <div class="container mt-5">
+        <div class="card shadow">
+            
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
                     <i class="fas fa-file-invoice me-2"></i>
-                    Detalle de Orden de Compra: ${orden.numeroOrden}
-                </h3>
+                    Orden de Compra: <strong>${orden.numeroOrden}</strong>
+                </h4>
+                <span class="badge bg-warning text-dark fs-6">${orden.estado}</span>
             </div>
+
             <div class="card-body">
-                <div class="row mb-4">
+                
+                <div class="row mb-4 p-3 bg-white rounded border">
                     <div class="col-md-6">
-                        <h5><strong>Proveedor:</strong></h5>
-                        <p>${orden.proveedor.razonSocial}</p>
+                        <h6 class="text-muted text-uppercase fw-bold">Proveedor</h6>
+                        <p class="fs-5 mb-0 text-primary">
+                            <i class="fas fa-building me-2"></i>
+                            ${orden.proveedor != null ? orden.proveedor.nombre : 'Proveedor No Asignado'}
+                        </p>
                     </div>
-                    <div class="col-md-3">
-                        <h5><strong>Fecha:</strong></h5>
-                        <p><fmt:formatDate value="${orden.fecha}" pattern="dd/MM/yyyy" /></p>
-                    </div>
-                    <div class="col-md-3">
-                        <h5><strong>Estado:</strong></h5>
-                        <span class="badge bg-success fs-6">${orden.estado}</span>
+                    <div class="col-md-6 text-md-end">
+                        <h6 class="text-muted text-uppercase fw-bold">Fecha de Emisión</h6>
+                        <p class="fs-5 mb-0">
+                            <i class="far fa-calendar-alt me-2"></i>
+                            ${orden.fecha}
+                        </p>
                     </div>
                 </div>
 
-                <c:if test="${not empty orden.cotizacionOrigen}">
-                    <div class="row mb-4">
-                        <div class="col-md-12">
-                            <h5><strong>Cotización de Origen:</strong></h5>
-                            <p>
-                                <a href="${pageContext.request.contextPath}/cotizaciones/ver/${orden.cotizacionOrigen.idCotizacion}">
-                                    ${orden.cotizacionOrigen.numeroCotizacion}
-                                </a>
-                            </p>
-                        </div>
-                    </div>
-                </c:if>
-
-                <h5 class="mt-4">Detalles de la Orden</h5>
-                <hr>
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Producto</th>
-                            <th class="text-end">Cantidad</th>
-                            <th class="text-end">Precio Unitario</th>
-                            <th class="text-end">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="detalle" items="${orden.detalles}">
+                <h5 class="mb-3 text-secondary border-bottom pb-2">Detalle de Productos</h5>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover align-middle">
+                        <thead class="table-secondary text-center">
                             <tr>
-                                <td>${detalle.producto.nombre}</td>
-                                <td class="text-end">${detalle.cantidad}</td>
-                                <td class="text-end">
-                                    <fmt:formatNumber value="${detalle.precioUnitario}" type="currency" currencySymbol="S/ " />
-                                </td>
-                                <td class="text-end">
-                                    <fmt:formatNumber value="${detalle.cantidad * detalle.precioUnitario}" type="currency" currencySymbol="S/ " />
+                                <th>#</th>
+                                <th class="text-start">Producto</th>
+                                <th>Cantidad</th>
+                                <th class="text-end">Precio Unit.</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:set var="granTotal" value="0" />
+                            
+                            <c:forEach var="det" items="${orden.detalles}" varStatus="status">
+                                <c:set var="subtotal" value="${det.cantidad * det.precioUnitario}" />
+                                <c:set var="granTotal" value="${granTotal + subtotal}" />
+                                
+                                <tr>
+                                    <td class="text-center">${status.count}</td>
+                                    <td>
+                                        <strong>${det.producto.nombre}</strong>
+                                    </td>
+                                    <td class="text-center">${det.cantidad}</td>
+                                    <td class="text-end">
+                                        S/ <fmt:formatNumber value="${det.precioUnitario}" minFractionDigits="2" maxFractionDigits="2"/>
+                                    </td>
+                                    <td class="text-end fw-bold">
+                                        S/ <fmt:formatNumber value="${subtotal}" minFractionDigits="2" maxFractionDigits="2"/>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+
+                            <c:if test="${empty orden.detalles}">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">
+                                        No hay productos registrados en esta orden.
+                                    </td>
+                                </tr>
+                            </c:if>
+                        </tbody>
+                        
+                        <tfoot class="table-dark">
+                            <tr>
+                                <td colspan="4" class="text-end fw-bold fs-5">TOTAL GENERAL:</td>
+                                <td class="text-end fw-bold fs-5">
+                                    S/ <fmt:formatNumber value="${granTotal}" minFractionDigits="2" maxFractionDigits="2"/>
                                 </td>
                             </tr>
-                        </c:forEach>
-                    </tbody>
-                    <tfoot>
-                        <tr class="fw-bold">
-                            <td colspan="3" class="text-end">Total General:</td>
-                            <td class="text-end fs-5">
-                                <fmt:formatNumber value="${orden.total}" type="currency" currencySymbol="S/ " />
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
+                        </tfoot>
+                    </table>
+                </div>
 
-                <div class="mt-4 text-center">
-                    <a href="${pageContext.request.contextPath}/compras" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Volver al Listado
+            </div>
+
+            <div class="card-footer bg-white d-flex justify-content-between py-3">
+                <a href="${pageContext.request.contextPath}/ordenes-compra/listado" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Volver al Listado
+                </a>
+                
+                <div>
+                    <a href="${pageContext.request.contextPath}/ordenes-compra/editar/${orden.idOrden}" class="btn btn-primary me-2">
+                        <i class="fas fa-edit me-1"></i> Editar
                     </a>
+                    <button class="btn btn-danger" onclick="window.print()">
+                        <i class="fas fa-print me-1"></i> Imprimir / PDF
+                    </button>
                 </div>
             </div>
+
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

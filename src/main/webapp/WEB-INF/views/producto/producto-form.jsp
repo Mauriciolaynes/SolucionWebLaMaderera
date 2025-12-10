@@ -63,7 +63,14 @@
                         <form:options items="${proveedores}" itemValue="idProveedor" itemLabel="nombre" />
                     </form:select>
                 </div>
-
+				<div class="form-group mb-3">
+				    <label for="imagen" class="form-label fw-bold">Ruta de la Imagen:</label>
+				    <input type="text" class="form-control" id="imagen" name="imagen" 
+				           placeholder="Ej: imagenes/Sillas/silla_id_1.jpg" required>
+				    <small class="text-muted">
+				        Copia aquí el nombre exacto del archivo que está en tu carpeta 'static'.
+				    </small>
+				</div>
             </div>
             <div class="button-group">
                 <a href="${pageContext.request.contextPath}/productos/listar" class="btn-cancelar">

@@ -1,25 +1,53 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%-- La URI correcta para JSTL con Jakarta EE --%>
 <%@taglib prefix="c" uri="jakarta.tags.core"%>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Carpintería - Multiservicios</title>
-    <!-- CSS de Bootstrap y estilos personalizados -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<c:url value='/Styles/PaginPrincipal.css'/>">
+
+    <style>
+        /* Estilos rápidos para asegurar que las tarjetas se vean bien */
+        .card-img-container {
+            height: 220px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        .card-img-top {
+            max-height: 100%;
+            width: auto;
+            max-width: 100%;
+            transition: transform 0.3s ease;
+        }
+        .card:hover .card-img-top {
+            transform: scale(1.05);
+        }
+        /* Ocultar flechas del input number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; margin: 0; 
+        }
+    </style>
 </head>
 <body data-bs-spy="scroll" data-bs-target="#main-nav">
 
     <header>
-        <nav id="main-nav" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <nav id="main-nav" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
             <div class="container">
                 <a class="navbar-brand" href="<c:url value='/'/>">
-                    <img src="<c:url value='/imagenes/Logo/Logo.png'/>" alt="Logo Maderera">
+                    <img src="<c:url value='/imagenes/Logo/Logo.png'/>" alt="Logo Maderera" style="height: 40px;">
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
@@ -29,20 +57,28 @@
                         <li class="nav-item"><a class="nav-link" href="#mesas">🍽️ Mesas</a></li>
                         <li class="nav-item"><a class="nav-link" href="#sillas">🪑 Sillas</a></li>
                     </ul>
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        
                         <c:choose>
                             <c:when test="${not empty sessionScope.usuarioLogueado}">
-                                <span class="navbar-text text-white me-3">
-                                    👋 Hola, ${sessionScope.usuarioLogueado.nombresApellidos}
-                                </span>
-                                <a href="<c:url value='/logout'/>" class="btn btn-outline-light me-2">Cerrar sesión</a>
+                                <div class="text-white d-none d-lg-block">
+                                    <small>Hola,</small><br>
+                                    <strong>${sessionScope.usuarioLogueado.nombresApellidos}</strong>
+                                </div>
+                                <a href="<c:url value='/logout'/>" class="btn btn-outline-danger btn-sm">Salir</a>
                             </c:when>
                             <c:otherwise>
-                                <a href="<c:url value='/login'/>" class="btn btn-primary me-2">Iniciar Sesión</a>
+                                <a href="<c:url value='/login'/>" class="btn btn-primary btn-sm">Iniciar Sesión</a>
                             </c:otherwise>
                         </c:choose>
-                        <a href="#" class="link-carrito">
-                            <img src="<c:url value='/imagenes/Carrito/carrito-de-compras.png'/>" alt="Carrito de Compras" style="width: 32px;">
+
+                        <a href="<c:url value='/carrito'/>" class="position-relative btn btn-outline-light border-0">
+                            <i class="bi bi-cart3 fs-4"></i>
+                            <c:if test="${not empty sessionScope.carrito}">
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light">
+                                    ${sessionScope.carrito.size()}
+                                </span>
+                            </c:if>
                         </a>
                     </div>
                 </div>
@@ -50,241 +86,221 @@
         </nav>
     </header>
 
-    <main class="container" style="margin-top: 80px;">
+    <main class="container" style="margin-top: 100px;">
 
         <section id="puertas" class="py-5">
-            <h2>Puertas Contrachapadas y de Madera</h2>
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mt-3">
-
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='imagenes/puertas/puerta 1.png'/>" class="card-img-top" alt="Puerta Contrachapada Barniz Rústico">
+            <h2 class="mb-4 border-bottom pb-2">Puertas Contrachapadas y de Madera</h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <c:forEach items="${listaProductos}" var="p">
+                    <c:if test="${p.categoria.idCategoria == 1}">
+                        <div class="col">
+                            <div class="card shadow-sm h-100 border-0">
+                                <div class="card-img-container">
+                                    <img src="<c:url value='/${p.imagen}'/>" class="card-img-top" alt="${p.nombre}">
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-truncate">${p.nombre}</h5>
+                                    <p class="card-text small text-muted flex-grow-1 text-truncate">${p.descripcion}</p>
+                                    <p class="precio fs-5 fw-bold text-primary mb-3">S/. ${p.precioVenta}</p>
+                                    
+                                    <c:choose>
+                                        <c:when test="${not empty sessionScope.usuarioLogueado}">
+                                            <form action="<c:url value='/carrito/agregar'/>" method="post" class="mt-auto">
+                                                <input type="hidden" name="idProducto" value="${p.idProducto}">
+                                                
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="input-group input-group-sm" style="width: 110px;">
+                                                        <button type="button" class="btn btn-outline-secondary" onclick="ajustarCantidad(this, -1)">-</button>
+                                                        <input type="number" name="cantidad" value="1" min="1" class="form-control text-center p-0" readonly style="background: white;">
+                                                        <button type="button" class="btn btn-outline-secondary" onclick="ajustarCantidad(this, 1)">+</button>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary btn-sm flex-fill">
+                                                        <i class="bi bi-cart-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="<c:url value='/login'/>" class="btn btn-outline-secondary btn-sm w-100 mt-auto">Login para comprar</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Barniz: Diseño Rústico</h5>
-                            <p class="card-text">Puerta contra placada de interior, madera tornillo, color nogal, acabado barniz, medidas personalizadas. Incluye instalación.</p>
-                            <p class="precio">S/.450</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='imagenes/puertas/puerta 2.png'/>" class="card-img-top" alt="Puerta Contrachapada Barniz Moderno">
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Barniz: Diseño Moderno</h5>
-                            <p class="card-text">Puerta contra placada de interior, madera tornillo, color caoba, acabado barniz, medidas personalizadas. Incluye instalación.</p>
-                            <p class="precio">S/.450</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='imagenes/puertas/puerta 3.png'/>" class="card-img-top" alt="Puerta Contrachapada Carátula Clásico">
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Carátula: Modelo Clásico</h5>
-                            <p class="card-text">Puerta contra placada de interior, carátula, color caoba, acabado en duco, medias personalizadas. Incluye instalación.</p>
-                            <p class="precio">S/.480</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='imagenes/puertas/puerta 4.png'/>" class="card-img-top" alt="Puerta de Madera Exterior Cedro Elegante">
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Exterior: Madera Cedro (Elegante)</h5>
-                            <p class="card-text">Puerta de madera de exterior cedro, color caoba, acabado barniz, diseño elegante, medias personalizadas. Incluye instalación.</p>
-                            <p class="precio">S/.3800</p>
-                        </div>
-                    </div>
-                </div>
-
+                    </c:if>
+                </c:forEach>
             </div>
         </section>
-
-        <hr>
 
         <section id="melamina" class="py-5">
-            <h2>Proyectos de Melamina (Diseño a la medida)</h2>
-            <div class="row row-cols-1 row-cols-md-2 g-4 mt-3">
-                
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='/imagenes/melamina/Melamina 1.png'/>" class="card-img-top" alt="Muebles de Cocina Melamina">
+            <h2 class="mb-4 border-bottom pb-2">Proyectos de Melamina</h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <c:forEach items="${listaProductos}" var="p">
+                    <c:if test="${p.categoria.idCategoria == 2}">
+                        <div class="col">
+                            <div class="card shadow-sm h-100 border-0">
+                                <div class="card-img-container">
+                                    <img src="<c:url value='/${p.imagen}'/>" class="card-img-top" alt="${p.nombre}">
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-truncate">${p.nombre}</h5>
+                                    <p class="card-text small text-muted flex-grow-1 text-truncate">${p.descripcion}</p>
+                                    <p class="precio fs-5 fw-bold text-primary mb-3">Ref: S/. ${p.precioVenta}</p>
+                                    
+                                    <c:choose>
+                                        <c:when test="${not empty sessionScope.usuarioLogueado}">
+                                            <form action="<c:url value='/carrito/agregar'/>" method="post" class="mt-auto">
+                                                <input type="hidden" name="idProducto" value="${p.idProducto}">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="input-group input-group-sm" style="width: 110px;">
+                                                        <button type="button" class="btn btn-outline-secondary" onclick="ajustarCantidad(this, -1)">-</button>
+                                                        <input type="number" name="cantidad" value="1" min="1" class="form-control text-center p-0" readonly style="background: white;">
+                                                        <button type="button" class="btn btn-outline-secondary" onclick="ajustarCantidad(this, 1)">+</button>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary btn-sm flex-fill"><i class="bi bi-cart-plus"></i></button>
+                                                </div>
+                                            </form>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="<c:url value='/login'/>" class="btn btn-outline-secondary btn-sm w-100 mt-auto">Login</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Muebles de Cocina</h5>
-                            <p class="card-text">Proyectos de melamina, diseño y color a elegir, medidas personalizadas. Incluye instalación del mueble.</p>
-                            <p class="precio">Precio varía (Ref:S/.4000)</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='/imagenes/melamina/Melamina 2.png'/>" class="card-img-top" alt="Muebles de Dormitorio Melamina">
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Muebles de Dormitorio</h5>
-                            <p class="card-text">Proyectos de melamina para dormitorios, diseño y color a elegir, medidas personalizadas. Incluye instalación del mueble.</p>
-                            <p class="precio">Precio varía (Ref: S/.4000)</p>
-                        </div>
-                    </div>
-                </div>
-                
+                    </c:if>
+                </c:forEach>
             </div>
         </section>
-
-        <hr>
 
         <section id="mesas" class="py-5">
-            <h2>Mesas</h2>
-            <div class="row row-cols-1 row-cols-md-2 g-4 mt-3">
-                
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='/imagenes/mesas/Mesa 1.png'/>" class="card-img-top" alt="Mesa Rústica Redonda">
+            <h2 class="mb-4 border-bottom pb-2">Mesas</h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <c:forEach items="${listaProductos}" var="p">
+                    <c:if test="${p.categoria.idCategoria == 3}">
+                        <div class="col">
+                            <div class="card shadow-sm h-100 border-0">
+                                <div class="card-img-container">
+                                    <img src="<c:url value='/${p.imagen}'/>" class="card-img-top" alt="${p.nombre}">
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-truncate">${p.nombre}</h5>
+                                    <p class="card-text small text-muted flex-grow-1 text-truncate">${p.descripcion}</p>
+                                    <p class="precio fs-5 fw-bold text-primary mb-3">S/. ${p.precioVenta}</p>
+                                    
+                                    <c:choose>
+                                        <c:when test="${not empty sessionScope.usuarioLogueado}">
+                                            <form action="<c:url value='/carrito/agregar'/>" method="post" class="mt-auto">
+                                                <input type="hidden" name="idProducto" value="${p.idProducto}">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="input-group input-group-sm" style="width: 110px;">
+                                                        <button type="button" class="btn btn-outline-secondary" onclick="ajustarCantidad(this, -1)">-</button>
+                                                        <input type="number" name="cantidad" value="1" min="1" class="form-control text-center p-0" readonly style="background: white;">
+                                                        <button type="button" class="btn btn-outline-secondary" onclick="ajustarCantidad(this, 1)">+</button>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary btn-sm flex-fill"><i class="bi bi-cart-plus"></i></button>
+                                                </div>
+                                            </form>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="<c:url value='/login'/>" class="btn btn-outline-secondary btn-sm w-100 mt-auto">Login</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Mesa Rústica</h5>
-                            <p class="card-text">Mesa rústica, diseño rústico, color natural, modelo rústico.</p>
-                            <p class="precio">Precio varía (Ref: S/.100)</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='/imagenes/mesas/Mesa 2.png'/>" class="card-img-top" alt="Mesa para Campo o Sala">
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Mesa para Campo</h5>
-                            <p class="card-text">Mesa para campo, diseño clásico, color natural, modelo clásico.</p>
-                            <p class="precio">Precio varía (Ref: S/.400)</p>
-                        </div>
-                    </div>
-                </div>
-
+                    </c:if>
+                </c:forEach>
             </div>
         </section>
 
-        <hr>
-
         <section id="sillas" class="py-5">
-            <h2>Sillas</h2>
-            <div class="row row-cols-1 row-cols-md-2 g-4 mt-3">
-                
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='/imagenes/sillas/Silla 1.png'/>" class="card-img-top" alt="Silla Clásica de Madera">
+            <h2 class="mb-4 border-bottom pb-2">Sillas</h2>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                <c:forEach items="${listaProductos}" var="p">
+                    <c:if test="${p.categoria.idCategoria == 4}">
+                        <div class="col">
+                            <div class="card shadow-sm h-100 border-0">
+                                <div class="card-img-container">
+                                    <img src="<c:url value='/${p.imagen}'/>" class="card-img-top" alt="${p.nombre}">
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title text-truncate">${p.nombre}</h5>
+                                    <p class="card-text small text-muted flex-grow-1 text-truncate">${p.descripcion}</p>
+                                    <p class="precio fs-5 fw-bold text-primary mb-3">S/. ${p.precioVenta}</p>
+                                    
+                                    <c:choose>
+                                        <c:when test="${not empty sessionScope.usuarioLogueado}">
+                                            <form action="<c:url value='/carrito/agregar'/>" method="post" class="mt-auto">
+                                                <input type="hidden" name="idProducto" value="${p.idProducto}">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="input-group input-group-sm" style="width: 110px;">
+                                                        <button type="button" class="btn btn-outline-secondary" onclick="ajustarCantidad(this, -1)">-</button>
+                                                        <input type="number" name="cantidad" value="1" min="1" class="form-control text-center p-0" readonly style="background: white;">
+                                                        <button type="button" class="btn btn-outline-secondary" onclick="ajustarCantidad(this, 1)">+</button>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary btn-sm flex-fill"><i class="bi bi-cart-plus"></i></button>
+                                                </div>
+                                            </form>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="<c:url value='/login'/>" class="btn btn-outline-secondary btn-sm w-100 mt-auto">Login</a>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Silla Clásica</h5>
-                            <p class="card-text">Sillas clásicas, modelo clásico, color natural.</p>
-                            <p class="precio">Precio varía (Ref: S/.60)</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card shadow-sm">
-                        <div class="card-img-container">
-                            <img src="<c:url value='/imagenes/sillas/Silla 2.png'/>" class="card-img-top" alt="Silla Elegante Tapizada">
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Silla Elegante Tapizada</h5>
-                            <p class="card-text">Sillas elegantes, modelo clásico, tapizados, color caoba.</p>
-                            <p class="precio">Precio varía (Ref: S/.90)</p>
-                        </div>
-                    </div>
-                </div>
-                
+                    </c:if>
+                </c:forEach>
             </div>
         </section>
 
     </main>
 
-    <footer class="footer-bg pt-5 pb-4">
+    <footer class="footer-bg pt-5 pb-4 mt-5 bg-dark text-white">
         <div class="container text-center text-md-start">
-            <div class="row text-center text-md-start">
-
-                <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-                    <h5 class="text-uppercase mb-4 fw-bold text-primary">Contacto</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Teléfono Lima (01)500-5540</a></li>
-                        <li class="mt-2">
-                            <a href="<c:url value='/libro-reclamaciones'/>">Libro de Reclamaciones</a>
-                            <%-- Aquí se añade la imagen del libro de reclamaciones --%>
-                            <a href="<c:url value='/libro-reclamaciones'/>"><img src="<c:url value='/imagenes/Iconos/libro-de-reclamaciones.png'/>" alt="Libro de Reclamaciones" style="max-width: 120px; margin-top: 8px; display: block;"></a>
-                        </li>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase fw-bold text-warning">Maderera Multiservicios</h6>
+                    <p class="small text-white-50">Calidad y garantía en trabajos de madera y melamina.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase fw-bold text-warning">Contacto</h6>
+                    <ul class="list-unstyled small text-white-50">
+                        <li>Lima (01)500-5540</li>
+                        <li><a href="<c:url value='/libro-reclamaciones'/>" class="text-white-50 text-decoration-none">Libro de Reclamaciones</a></li>
                     </ul>
                 </div>
-
-                <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-                    <h5 class="text-uppercase mb-4 fw-bold text-primary">Sobre Nosotros</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Nuestra historia</a></li>
-                        <li><a href="#">Horarios y locales</a></li>
-                        <li><a href="#">Trabaja con nosotros</a></li>
-                        <li><a href="#">Ventas corporativas</a></li>
-                    </ul>
+                <div class="col-md-4 mb-3">
+                    <h6 class="text-uppercase fw-bold text-warning">Pagos Seguros</h6>
+                    <div class="bg-white p-2 rounded d-inline-block">
+                        <img src="<c:url value='/imagenes/iconos/Icono_Yape.png'/>" alt="Yape" height="25" class="me-2">
+                        <img src="<c:url value='/imagenes/iconos/Icono_Plin.png'/>" alt="Plin" height="25" class="me-2">
+                        <img src="<c:url value='/imagenes/iconos/Icono_PayPal.png'/>" alt="Paypal" height="25">
+                    </div>
                 </div>
-
-                <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-                    <h5 class="text-uppercase mb-4 fw-bold text-primary">Políticas & Términos</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="#">Términos y condiciones</a></li>
-                        <li><a href="#">Políticas de privacidad</a></li>
-                        <li><a href="#">Políticas de delivery</a></li>
-                        <li><a href="#">Pólitica de cookies</a></li>
-                    </ul>
-                </div>
-
             </div>
-            <hr class="my-4">
-            
-            <!-- Métodos de pago -->
-            <div class="text-center p-3 border rounded">
-                <h6 class="text-uppercase fw-bold mb-3">Métodos de pago seguros</h6>
-                <%-- Asegúrate de que los nombres de archivo coincidan con los que tienes en la carpeta /imagenes/iconos/ --%>
-                <a href="https://www.izipay.pe/" target="_blank" rel="noopener noreferrer">
-                    <img src="<c:url value='/imagenes/iconos/icono_IziPay.png'/>" alt="IziPay" class="me-2" style="height: 35px;">
-                </a>
-                <a href="https://www.mercadopago.com.pe/" target="_blank" rel="noopener noreferrer">
-                    <img src="<c:url value='/imagenes/iconos/Icono_MercadoP.png'/>" alt="MercadoPago" class="me-2" style="height: 35px;">
-                </a>
-                <a href="https://www.paypal.com/pe/home" target="_blank" rel="noopener noreferrer">
-                    <img src="<c:url value='/imagenes/iconos/Icono_PayPal.png'/>" alt="PayPal" class="me-2" style="height: 35px;">
-                </a>
-                <a href="https://www.plin.pe/" target="_blank" rel="noopener noreferrer">
-                    <img src="<c:url value='/imagenes/iconos/Icono_Plin.png'/>" alt="Plin" class="me-2" style="height: 35px;">
-                </a>
-                <a href="https://www.yape.com.pe/" target="_blank" rel="noopener noreferrer">
-                    <img src="<c:url value='/imagenes/iconos/Icono_Yape.png'/>" alt="Yape" class="me-2" style="height: 35px;">
-                </a>
-            </div>
-
-            <div class="text-center mb-2">
-                <img src="<c:url value='/imagenes/Carrito/footer.png'/>" alt="Logo Maderera Multiservicios" style="max-height: 50px;">
-            </div>
-            <div class="text-center">
-                <p>&copy; 2024 Maderera Multiservicios. Todos los derechos reservados.</p>
+            <div class="text-center mt-3 pt-3 border-top border-secondary small text-white-50">
+                &copy; 2025 Maderera Multiservicios. Todos los derechos reservados.
             </div>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function ajustarCantidad(btn, cambio) {
+            // Buscamos el input vecino dentro del mismo grupo
+            var input = btn.parentNode.querySelector('input[name="cantidad"]');
+            var valorActual = parseInt(input.value);
+            var nuevoValor = valorActual + cambio;
+
+            // Validamos que no baje de 1
+            if (nuevoValor >= 1) {
+                input.value = nuevoValor;
+            }
+        }
+    </script>
+
 </body>
 </html>
