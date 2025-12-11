@@ -35,6 +35,8 @@
                                         class="fas fa-warehouse"></i> Inventario</a></li>
                             <li><a href="${pageContext.request.contextPath}/admin/listar-empleados"><i
                                         class="fas fa-users"></i> Usuarios</a></li>
+                            <li><a href="${pageContext.request.contextPath}/admin/backup"><i
+                                        class="fas fa-database"></i> Backups</a></li>
                         </ul>
                     </nav>
                     <div class="logout-button">
