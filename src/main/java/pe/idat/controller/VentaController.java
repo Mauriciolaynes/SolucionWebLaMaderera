@@ -12,6 +12,9 @@ import pe.idat.service.ProductoService;
 import pe.idat.service.UsuarioService;
 import pe.idat.service.VentaService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 @RequestMapping("/ventas")
 public class VentaController {
@@ -49,14 +52,23 @@ public class VentaController {
     public ResponseEntity<?> guardarVenta(@RequestBody Venta venta) {
         try {
             Venta nuevaVenta = ventaService.crearVenta(venta);
-            return new ResponseEntity<>(nuevaVenta, HttpStatus.CREATED);
+
+            // En lugar de devolver el objeto completo (que tiene referencias circulares),
+            // devolvemos solo un mapa con el ID
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", nuevaVenta.getId());
+            response.put("total", nuevaVenta.getTotal());
+            response.put("mensaje", "Venta registrada correctamente");
+
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (RuntimeException e) {
             // Capturamos excepciones de negocio (ej. "Stock insuficiente")
             // y devolvemos un mensaje de error claro.
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // Otras excepciones inesperadas
-            return new ResponseEntity<>("Ocurrió un error inesperado al procesar la venta.", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Ocurrió un error inesperado al procesar la venta.",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

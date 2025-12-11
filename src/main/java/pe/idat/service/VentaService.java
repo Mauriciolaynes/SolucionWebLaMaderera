@@ -21,21 +21,28 @@ import java.util.List;
 @Service
 public class VentaService {
 
+    // Almacén principal (debe coincidir con InventarioService)
+    private static final Integer ID_ALMACEN_PRINCIPAL = 1;
+
     @Autowired
     private VentaRepository ventaRepository;
-    
+
     @Autowired
     private ProductoService productoService;
 
     // Si necesitas buscar el usuario por su ID antes de asignarlo a la venta
     // @Autowired
-    // private UsuarioRepository usuarioRepository; // Necesitarías crear este repositorio
+    // private UsuarioRepository usuarioRepository; // Necesitarías crear este
+    // repositorio
 
     @Autowired
     private UsuarioRepository usuarioRepository;
 
     @Autowired
     private AlmacenProductoRepository almacenProductoRepository;
+
+    @Autowired
+    private MovimientoAlmacenService movimientoService;
 
     @Transactional
     public Venta crearVenta(Venta venta) {
@@ -44,7 +51,8 @@ public class VentaService {
 
         // 2. Validar y cargar el usuario completo
         Usuario usuario = usuarioRepository.findById(venta.getUsuario().getIdUsuario())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + venta.getUsuario().getIdUsuario()));
+                .orElseThrow(() -> new RuntimeException(
+                        "Usuario no encontrado con ID: " + venta.getUsuario().getIdUsuario()));
         venta.setUsuario(usuario);
 
         BigDecimal totalVenta = BigDecimal.ZERO;
@@ -69,11 +77,15 @@ public class VentaService {
             totalVenta = totalVenta.add(subtotal);
 
             // 4. Actualizar el stock del producto en el almacén
-            // Asumimos que se descuenta del almacén principal (ID = 1). Esto se puede hacer más dinámico.
+            // Asumimos que se descuenta del almacén principal (ID = 1). Esto se puede hacer
+            // más dinámico.
             final Integer ID_ALMACEN_PRINCIPAL = 1;
-            Optional<AlmacenProducto> inventarioOpt = almacenProductoRepository.findByAlmacen_IdAlmacenAndProducto_IdProducto(ID_ALMACEN_PRINCIPAL, producto.getIdProducto());
+            Optional<AlmacenProducto> inventarioOpt = almacenProductoRepository
+                    .findByAlmacen_IdAlmacenAndProducto_IdProducto(ID_ALMACEN_PRINCIPAL, producto.getIdProducto());
 
-            AlmacenProducto inventario = inventarioOpt.orElseThrow(() -> new RuntimeException("No hay registro de inventario para el producto " + producto.getNombre() + " en el almacén principal."));
+            AlmacenProducto inventario = inventarioOpt
+                    .orElseThrow(() -> new RuntimeException("No hay registro de inventario para el producto "
+                            + producto.getNombre() + " en el almacén principal."));
 
             if (inventario.getStockActual() < detalle.getCantidad()) {
                 throw new RuntimeException("Stock insuficiente para el producto: " + producto.getNombre());
@@ -81,6 +93,19 @@ public class VentaService {
 
             inventario.setStockActual(inventario.getStockActual() - detalle.getCantidad());
             almacenProductoRepository.save(inventario);
+
+            // 🆕 NUEVO: Registrar movimiento de SALIDA
+            try {
+                movimientoService.registrarSalida(
+                        producto.getIdProducto(),
+                        ID_ALMACEN_PRINCIPAL,
+                        detalle.getCantidad(),
+                        usuario.getIdUsuario(),
+                        String.format("Venta a cliente: %s", usuario.getNombresApellidos()));
+            } catch (Exception e) {
+                // Log del error pero no fallar la venta
+                System.err.println("Error al registrar movimiento de salida: " + e.getMessage());
+            }
         }
 
         // 5. Asignar el total calculado a la venta
