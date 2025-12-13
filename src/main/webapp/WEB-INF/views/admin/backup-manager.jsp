@@ -160,7 +160,7 @@
                 </div>
                 <nav>
                     <ul>
-                        <li><a href="${pageContext.request.contextPath}/admin/dashboard"><i class="fas fa-home"></i>
+                        <li><a href="${pageContext.request.contextPath}/admin/admin-dashboard"><i class="fas fa-home"></i>
                                 Dashboard</a></li>
                         <li><a href="${pageContext.request.contextPath}/productos/listar"><i class="fas fa-box"></i>
                                 Productos</a></li>
