@@ -5,9 +5,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Finalizar Compra - Maderera Multiservicios</title>
+    <title>Finalizar Compra - Maderera</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <style>
         body { background-color: #f4f4f4; }
@@ -35,7 +36,7 @@
             <div class="col-lg-8">
                 <h4 class="mb-4 fw-bold">Elige tu medio de pago</h4>
                 
-                <form action="<c:url value='/venta/finalizar'/>" method="post" id="formPago">
+                <form action="<c:url value='/carrito/finalizar'/>" method="post" id="formPago">
                     
                     <div class="card p-3 mb-3 payment-option" onclick="seleccionarPago('yape')">
                         <div class="d-flex align-items-center">
@@ -121,7 +122,7 @@
                         <span class="fw-bold fs-3 text-primary">S/ ${total}</span>
                     </div>
 
-                    <button type="submit" form="#" class="btn btn-success w-100 py-3 fw-bold rounded-pill shadow-sm">
+                    <button type="button" onclick="confirmarPago()" class="btn btn-success w-100 py-3 fw-bold rounded-pill shadow-sm">
                         CONFIRMAR PAGO <i class="bi bi-arrow-right"></i>
                     </button>
                     
@@ -140,18 +141,34 @@
     </main>
 
     <script>
+        // Función visual para seleccionar método de pago
         function seleccionarPago(metodo) {
             // 1. Marcar el radio button
             document.getElementById('radio' + metodo.charAt(0).toUpperCase() + metodo.slice(1)).checked = true;
             
             // 2. Mostrar/Ocultar detalles visuales
-            // Ocultar todos los detalles extra
             document.getElementById('info-yape').classList.add('d-none');
             document.getElementById('info-tarjeta').classList.add('d-none');
             
-            // Mostrar el seleccionado
             if(metodo === 'yape') document.getElementById('info-yape').classList.remove('d-none');
             if(metodo === 'tarjeta') document.getElementById('info-tarjeta').classList.remove('d-none');
+        }
+
+        // NUEVA FUNCIÓN: Alerta de Éxito + Envío del formulario
+        function confirmarPago() {
+            Swal.fire({
+                title: '¡Pago Exitoso!',
+                text: 'Tu compra ha sido procesada correctamente.',
+                icon: 'success',
+                confirmButtonColor: '#198754', // Verde éxito
+                confirmButtonText: 'Aceptar y Ver Ticket',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Solo cuando el usuario da click en "Aceptar", enviamos al Ticket
+                    document.getElementById('formPago').submit();
+                }
+            });
         }
     </script>
     

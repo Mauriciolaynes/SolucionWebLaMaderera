@@ -15,7 +15,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/carrito")
 public class CarritoController {
-	@Autowired
+    @Autowired
     private ProductoRepository productoRepository;
 
     // 1. VER EL CARRITO
@@ -26,7 +26,7 @@ public class CarritoController {
         if (carrito == null) {
             carrito = new ArrayList<>();
         }
-        
+
         // Calcular total
         Double total = 0.0;
         for (ItemCarrito item : carrito) {
@@ -35,19 +35,19 @@ public class CarritoController {
 
         model.addAttribute("carrito", carrito);
         model.addAttribute("total", total);
-        
+
         return "Carrito/Carrito"; // Retorna Carrito.jsp
     }
 
     // 2. AGREGAR PRODUCTO AL CARRITO
     @PostMapping("/agregar")
-    public String agregarAlCarrito(@RequestParam("idProducto") Integer idProducto, 
-                                   @RequestParam(value = "cantidad", defaultValue = "1") Integer cantidad,
-                                   HttpSession session) {
-        
+    public String agregarAlCarrito(@RequestParam("idProducto") Integer idProducto,
+            @RequestParam(value = "cantidad", defaultValue = "1") Integer cantidad,
+            HttpSession session) {
+
         // Buscar el producto en la BD
         Producto producto = productoRepository.findById(idProducto).orElse(null);
-        
+
         if (producto != null) {
             // Recuperar carrito de sesión
             List<ItemCarrito> carrito = (List<ItemCarrito>) session.getAttribute("carrito");
@@ -88,7 +88,7 @@ public class CarritoController {
         }
         return "redirect:/carrito";
     }
- // ... tus métodos anteriores ...
+    // ... tus métodos anteriores ...
 
     // 4. SUMAR CANTIDAD (+1)
     @GetMapping("/sumar/{id}")
@@ -124,15 +124,16 @@ public class CarritoController {
         }
         return "redirect:/carrito";
     }
+
     @GetMapping("/procesar")
     public String procesarPago(HttpSession session, Model model) {
         List<ItemCarrito> carrito = (List<ItemCarrito>) session.getAttribute("carrito");
-        
+
         // Validación: Si no hay carrito o está vacío, volver al inicio
         if (carrito == null || carrito.isEmpty()) {
             return "redirect:/";
         }
-        
+
         // Calculamos el total nuevamente por seguridad
         Double total = 0.0;
         for (ItemCarrito item : carrito) {
@@ -141,5 +142,34 @@ public class CarritoController {
         model.addAttribute("total", total);
 
         return "Carrito/Pago"; // Busca el archivo Pago.jsp
+    }
+
+    @PostMapping("/finalizar")
+    public String finalizarVenta(HttpSession session, Model model) {
+        List<ItemCarrito> carrito = (List<ItemCarrito>) session.getAttribute("carrito");
+
+        if (carrito == null || carrito.isEmpty()) {
+            return "redirect:/";
+        }
+
+        // Calculamos totales para el Ticket
+        Double subtotal = 0.0;
+        for (ItemCarrito item : carrito) {
+            subtotal += item.getSubtotal();
+        }
+
+        // Enviamos datos al Ticket.jsp
+        model.addAttribute("items", carrito);
+        model.addAttribute("total", subtotal);
+        model.addAttribute("fecha", java.time.LocalDate.now());
+        model.addAttribute("hora", java.time.LocalTime.now().toString().substring(0, 5));
+        model.addAttribute("nroPedido", "P-" + System.currentTimeMillis());
+
+        // --- ¡ESTA ES LA LÍNEA MÁGICA QUE TE FALTABA! ---
+        // Borramos el carrito de la memoria para que quede vacío
+        session.removeAttribute("carrito");
+        // ------------------------------------------------
+
+        return "Carrito/Ticket";
     }
 }
